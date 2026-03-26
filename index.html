@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="es" class="color-scheme-light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Asignaturas</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class' };
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        input[type="date"] { color-scheme: inherit; }
+        .interactive-card { transition: all 0.3s ease; }
+        .interactive-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .svg-ray { stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 0.8s ease; }
+        .group:hover .svg-ray { stroke-dashoffset: 0; }
+        .entasis-column { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 0; }
+        .group:hover .entasis-column { border-radius: 50% 50% 50% 50% / 5% 5% 5% 5%; transform: scaleX(1.15); }
+        .arch-stone { transition: transform 0.4s ease, fill 0.4s ease; }
+        .group:hover .arch-stone { transform: translateY(-2px); fill: #f43f5e; }
+        .venn-circle { transition: all 0.3s ease; }
+        .venn-circle:hover { fill-opacity: 0.6; }
+        .grid-pattern { background-size: 40px 40px; background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px); }
+        .dark .grid-pattern { background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px); }
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #f59e0b; cursor: pointer; margin-top: -6px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #cbd5e1; border-radius: 2px; }
+        .dark input[type=range]::-webkit-slider-runnable-track { background: #334155; }
+    </style>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen selection:bg-amber-500/30 flex flex-col overflow-y-scroll transition-colors duration-300">
+
+    <header class="bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+            <div id="breadcrumb" class="text-slate-600 dark:text-slate-400 text-xs sm:text-sm md:text-base font-medium flex items-center gap-2 whitespace-nowrap overflow-x-auto scrollbar-hide"></div>
+            
+            <div class="flex items-center gap-2 sm:gap-4">
+                <button onclick="requestNotif()" class="text-slate-500 hover:text-amber-500 transition-colors hidden sm:block" title="Activar Notificaciones">
+                    <i class="fa-solid fa-bell"></i>
+                </button>
+                <a href="#tareas" id="nav-tareas" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 sm:gap-2 px-2 py-1 border-b-2 border-transparent">
+                    <i class="fa-solid fa-list-check"></i> <span class="hidden sm:inline">Calendario</span>
+                </a>
+                <a href="#horario" id="nav-horario" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 sm:gap-2 px-2 py-1 border-b-2 border-transparent">
+                    <i class="fa-solid fa-calendar-days"></i> <span class="hidden sm:inline">Horario</span>
+                </a>
+                <a href="#glosario" id="nav-glosario" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 sm:gap-2 px-2 py-1 border-b-2 border-transparent">
+                    <i class="fa-solid fa-book-bookmark"></i> <span class="hidden sm:inline">Glosario</span>
+                </a>
+                <button id="theme-toggle" class="p-1.5 sm:p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none transition-colors border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon text-base sm:text-lg"></i>
+                    <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun text-base sm:text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main id="app-root" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 w-full space-y-8"></main>
+
+    <div id="modal-task-form" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-md mx-auto shadow-2xl transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="modal-form-content">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+                <h3 id="modal-form-title" class="text-xl font-bold text-slate-900 dark:text-white">Crear Tarea</h3>
+                <button id="btn-close-form" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors bg-slate-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="task-form" class="space-y-4">
+                <input type="hidden" id="task-id">
+                <div>
+                    <label class="block text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Título</label>
+                    <input type="text" id="task-title" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Descripción</label>
+                    <textarea id="task-desc" rows="2" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 outline-none transition-all resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Subtareas</label>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="subtask-input" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-lg px-3 py-2 outline-none">
+                        <button type="button" id="btn-add-subtask" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <ul id="temp-subtasks-list" class="space-y-1 text-sm"></ul>
+                </div>
+                <div>
+                    <label class="block text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Fecha de entrega</label>
+                    <input type="date" id="task-date" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium text-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Asignatura</label>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="subject" value="Proyectos 1" class="peer hidden" checked>
+                            <div class="px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 border-transparent peer-checked:border-amber-500 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 transition-all">Proyectos 1</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="subject" value="Estructuras 1" class="peer hidden">
+                            <div class="px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 border-transparent peer-checked:border-blue-500 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 transition-all">Estructuras 1</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="subject" value="Comunicación 1" class="peer hidden">
+                            <div class="px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 border-transparent peer-checked:border-purple-500 bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 transition-all">Comunicación 1</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="subject" value="Representación 1" class="peer hidden">
+                            <div class="px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 border-transparent peer-checked:border-emerald-500 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 transition-all">Representación 1</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="subject" value="Arquitectura 1" class="peer hidden">
+                            <div class="px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 border-transparent peer-checked:border-rose-500 bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400 transition-all">Arquitectura 1</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="subject" value="General" class="peer hidden">
+                            <div class="px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border-2 border-transparent peer-checked:border-slate-500 bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-300 transition-all">General</div>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" id="btn-submit-form" class="w-full bg-amber-500 hover:bg-amber-600 border border-amber-600 text-slate-900 font-bold text-sm py-3.5 rounded-xl transition-all shadow-md mt-4 flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-save"></i> Guardar Tarea
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-task-details" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-lg shadow-2xl transform scale-95 transition-transform duration-300" id="modal-details-content">
+            <div class="flex justify-between items-start mb-4">
+                <div id="dt-subject" class="px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-widest uppercase border bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"></div>
+                <button id="btn-close-details" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors bg-slate-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <h3 id="dt-title" class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2"></h3>
+            <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6 font-bold">
+                <i class="fa-regular fa-calendar"></i> <span id="dt-date"></span>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 mb-4 border border-slate-200 dark:border-slate-700/50 shadow-inner">
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2">Descripción</p>
+                <p id="dt-desc" class="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto font-medium"></p>
+            </div>
+            <div class="mb-6 hidden" id="dt-subtasks-container">
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2">Subtareas</p>
+                <div id="dt-subtasks" class="space-y-2 max-h-32 overflow-y-auto pr-2"></div>
+            </div>
+            <div class="space-y-3">
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Actualizar Estado</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <button data-status="pending" class="btn-status border py-2.5 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800">Pendiente</button>
+                    <button data-status="progress" class="btn-status border py-2.5 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800">En Progreso</button>
+                    <button data-status="completed" class="btn-status border py-2.5 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800">Lista</button>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
+                <button id="btn-edit-task" class="text-xs font-bold uppercase tracking-wider text-blue-500 hover:text-white transition-colors flex items-center gap-2 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-900/50 hover:bg-blue-500 hover:border-blue-500">
+                    <i class="fa-solid fa-pen"></i> Editar
+                </button>
+                <button id="btn-delete-task" class="text-xs font-bold uppercase tracking-wider text-red-500 hover:text-white transition-colors flex items-center gap-2 px-4 py-2 rounded-lg border border-red-200 dark:border-red-900/50 hover:bg-red-500 hover:border-red-500">
+                    <i class="fa-solid fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-class-info" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-md mx-auto shadow-2xl transform scale-95 transition-transform duration-300" id="modal-class-content">
+            <div class="flex justify-between items-start mb-4 sm:mb-6">
+                <div id="class-color-indicator" class="px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-widest uppercase mb-2 border">ASIGNATURA</div>
+                <button id="btn-close-class" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 bg-slate-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <h3 id="class-title" class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-5 sm:mb-6"></h3>
+            <div class="space-y-4 sm:space-y-6">
+                <div class="flex items-center gap-3 sm:gap-4 text-slate-600 dark:text-slate-300">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 border border-slate-200 dark:border-slate-700">
+                        <i class="fa-regular fa-clock text-base sm:text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider font-bold mb-0.5">Horario</p>
+                        <p id="class-time" class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4 text-slate-600 dark:text-slate-300">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 border border-slate-200 dark:border-slate-700">
+                        <i class="fa-solid fa-location-dot text-base sm:text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider font-bold mb-0.5">Ubicación</p>
+                        <p id="class-room" class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4 text-slate-600 dark:text-slate-300">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 border border-slate-200 dark:border-slate-700">
+                        <i class="fa-solid fa-chalkboard-user text-base sm:text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider font-bold mb-0.5">Profesor(es)</p>
+                        <p id="class-teacher" class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="class-details-container" class="hidden mt-6 pt-5 border-t border-slate-200 dark:border-slate-700">
+                <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider font-bold mb-3 flex items-center gap-2"><i class="fa-solid fa-address-book"></i> Contacto Profesores</p>
+                <ul id="class-emails-list" class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4"></ul>
+            </div>
+        </div>
+    </div>
+
+    <template data-route="#home">
+        <div id="attendance-alert-container" class="mb-6 animate-fade-in hidden"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-fade-in">
+            <!-- Proyectos 1 -->
+            <div class="bg-amber-100 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-amber-400 dark:hover:border-amber-700 group relative overflow-hidden flex flex-col h-full">
+                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
+                    <i class="fa-solid fa-pen-ruler text-6xl sm:text-8xl text-amber-500"></i>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-200 dark:bg-amber-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-amber-400 dark:border-amber-700 transition-colors shrink-0 relative z-10">
+                    <i class="fa-solid fa-pen-ruler text-amber-700 dark:text-amber-400 text-lg sm:text-xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-amber-950 dark:text-amber-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Proyectos 1</h3>
+                <p class="text-amber-700/80 dark:text-amber-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Taller de diseño y conceptualización espacial.</p>
+                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-amber-200/60 dark:border-amber-800/60">
+                    <a href="#proyectos_1" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-amber-300/50 dark:border-amber-700/50 hover:border-amber-400 dark:hover:border-amber-600 text-amber-800 dark:text-amber-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-bolt"></i> Repaso
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1p21DqRIOzJoSIHMZp-z7b6SWfJ_L73vu?usp=sharing" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-amber-300/50 dark:border-amber-700/50 hover:border-amber-400 dark:hover:border-amber-600 text-amber-800 dark:text-amber-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-amber-600 dark:text-amber-400"></i> Material
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Estructuras 1 -->
+            <div class="bg-blue-100 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-blue-400 dark:hover:border-blue-700 group relative overflow-hidden flex flex-col h-full">
+                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
+                    <i class="fa-solid fa-building text-6xl sm:text-8xl text-blue-500"></i>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-200 dark:bg-blue-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-blue-400 dark:border-blue-700 transition-colors shrink-0 relative z-10">
+                    <i class="fa-solid fa-building text-blue-700 dark:text-blue-400 text-lg sm:text-xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-blue-950 dark:text-blue-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Estructuras 1</h3>
+                <p class="text-blue-700/80 dark:text-blue-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Matemáticas y principios físicos aplicados.</p>
+                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-blue-200/60 dark:border-blue-800/60">
+                    <a href="#estructuras_1" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-blue-300/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-600 text-blue-800 dark:text-blue-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-bolt"></i> Repaso
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1xXq35egFjH3ThsywAAVwXS0dfYszjUiX?usp=sharing" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-blue-300/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-600 text-blue-800 dark:text-blue-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-blue-600 dark:text-blue-400"></i> Material
+                    </a>
+                </div>
+            </div>
+
+            <!-- Comunicación 1 -->
+            <div class="bg-purple-100 dark:bg-purple-950/30 border border-purple-300 dark:border-purple-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-purple-400 dark:hover:border-purple-700 group relative overflow-hidden flex flex-col h-full">
+                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
+                    <i class="fa-solid fa-comments text-6xl sm:text-8xl text-purple-500"></i>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-200 dark:bg-purple-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-purple-400 dark:border-purple-700 shrink-0 relative z-10">
+                    <i class="fa-solid fa-comments text-purple-700 dark:text-purple-400 text-lg sm:text-xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-purple-950 dark:text-purple-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Comunicación 1</h3>
+                <p class="text-purple-700/80 dark:text-purple-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Expresión oral, escrita y visual.</p>
+                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-purple-200/60 dark:border-purple-800/60">
+                    <button disabled class="flex-1 bg-white/40 dark:bg-black/10 border border-purple-300/30 dark:border-purple-700/30 text-purple-800/50 dark:text-purple-300/50 text-xs font-bold py-2 px-2 rounded-xl text-center cursor-not-allowed flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-lock"></i> Repaso
+                    </button>
+                    <a href="https://drive.google.com/drive/folders/1j-tkIUE8CuCd-Tp81Od86fkrudWbcUHw?usp=sharing" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-purple-300/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-600 text-purple-800 dark:text-purple-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-purple-600 dark:text-purple-400"></i> Material
+                    </a>
+                </div>
+            </div>
+
+            <!-- Representación 1 -->
+            <div class="bg-emerald-100 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-700 group relative overflow-hidden flex flex-col h-full">
+                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
+                    <i class="fa-solid fa-vector-square text-6xl sm:text-8xl text-emerald-500"></i>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-200 dark:bg-emerald-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-emerald-400 dark:border-emerald-700 shrink-0 relative z-10">
+                    <i class="fa-solid fa-vector-square text-emerald-700 dark:text-emerald-400 text-lg sm:text-xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-emerald-950 dark:text-emerald-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Representación 1</h3>
+                <p class="text-emerald-700/80 dark:text-emerald-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Dibujo arquitectónico, planimetría y modelado.</p>
+                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-emerald-200/60 dark:border-emerald-800/60">
+                    <button disabled class="flex-1 bg-white/40 dark:bg-black/10 border border-emerald-300/30 dark:border-emerald-700/30 text-emerald-800/50 dark:text-emerald-300/50 text-xs font-bold py-2 px-2 rounded-xl text-center cursor-not-allowed flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-lock"></i> Repaso
+                    </button>
+                    <a href="https://drive.google.com/drive/folders/1os3QGHCRY0mREwkNQObnkbgqmYhkIvWV?usp=sharing" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-emerald-300/50 dark:border-emerald-700/50 hover:border-emerald-400 dark:hover:border-emerald-600 text-emerald-800 dark:text-emerald-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-emerald-600 dark:text-emerald-400"></i> Material
+                    </a>
+                </div>
+            </div>
+
+            <!-- Arquitectura 1 -->
+            <div class="bg-rose-100 dark:bg-rose-950/30 border border-rose-300 dark:border-rose-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-rose-400 dark:hover:border-rose-700 group relative overflow-hidden flex flex-col h-full">
+                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
+                    <i class="fa-solid fa-landmark text-6xl sm:text-8xl text-rose-500"></i>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-200 dark:bg-rose-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-rose-400 dark:border-rose-700 shrink-0 relative z-10">
+                    <i class="fa-solid fa-landmark text-rose-700 dark:text-rose-400 text-lg sm:text-xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-rose-950 dark:text-rose-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Arquitectura 1</h3>
+                <p class="text-rose-700/80 dark:text-rose-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Historia, teoría y referentes clásicos.</p>
+                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-rose-200/60 dark:border-rose-800/60">
+                    <a href="#arquitectura_1" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-rose-300/50 dark:border-rose-700/50 hover:border-rose-400 dark:hover:border-rose-600 text-rose-800 dark:text-rose-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-bolt"></i> Repaso
+                    </a>
+                    <a href="https://drive.google.com/drive/u/1/folders/14bQFECXBFdK7GZMajfrTz4GAwX_OvSV7" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-rose-300/50 dark:border-rose-700/50 hover:border-rose-400 dark:hover:border-rose-600 text-rose-800 dark:text-rose-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-rose-600 dark:text-rose-400"></i> Material
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 sm:p-6 mt-8 animate-fade-in">
+            <div class="flex items-center justify-between mb-6 border-b border-slate-200 dark:border-slate-700 pb-3">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="bg-amber-500 text-slate-900 p-1.5 rounded shadow-sm">
+                        <i class="fa-solid fa-list-check text-sm sm:text-base"></i>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Tareas Próximas</h2>
+                </div>
+                <a href="#tareas" class="text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm">Ver panel <i class="fa-solid fa-arrow-right ml-1"></i></a>
+            </div>
+            <div id="dashboard-tasks" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"></div>
+        </div>
+        
+        <div class="bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 sm:p-6 mt-8 animate-fade-in">
+            <div class="flex items-center gap-2 sm:gap-3 mb-6 border-b border-slate-200 dark:border-slate-700 pb-3">
+                <div class="bg-emerald-500 text-white p-1.5 rounded shadow-sm">
+                    <i class="fa-solid fa-link text-sm sm:text-base"></i>
+                </div>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Enlaces Institucionales</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <a href="https://docencia.ulagos.cl/notas" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Notas</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Portal de docencia</span>
+                    </div>
+                </a>
+                <a href="https://idelfos.ulagos.cl:8443/idelfos/faces/index.jspx" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-md transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-file-contract"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">iDelfos</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Certificados</span>
+                    </div>
+                </a>
+                <a href="https://asistencia.ulagos.cl/" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-rose-400 dark:hover:border-rose-600 hover:shadow-md transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-clipboard-user"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Asistencia</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Registro de clases</span>
+                    </div>
+                </a>
+                <a href="https://semda.ulagos.cl/solicitudes/" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-md transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-notes-medical"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">SEMDA</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Licencias Médicas</span>
+                    </div>
+                </a>
+                <a href="https://research.ebsco.com/c/arw3kp/search" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-600 hover:shadow-md transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Biblioteca</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Búsqueda de material</span>
+                    </div>
+                </a>
+                <a href="https://www.ulagosvirtual.cl/" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-md transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">ULagos Virtual</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Plataforma E-learning</span>
+                    </div>
+                </a>
+                <a href="https://pagos.ulagos.cl/" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-md transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Pagos</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Aranceles y otros</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </template>
+
+    <template data-route="#arquitectura_1">
+        <div class="animate-fade-in space-y-4">
+            <div class="flex items-center gap-2 sm:gap-3 mb-6">
+                <div class="bg-rose-500 text-white p-1.5 rounded shadow-sm">
+                    <i class="fa-solid fa-folder-open text-base sm:text-lg"></i>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Directorio Arquitectura 1</h2>
+            </div>
+            <div class="space-y-3 sm:space-y-4">
+                <a href="#origenes_y_evolucion" class="bg-rose-100 dark:bg-rose-950/30 border border-rose-300 dark:border-rose-800/50 rounded-xl p-4 sm:p-6 flex items-center justify-between group block transition-all max-w-4xl hover:shadow-md hover:-translate-y-1 hover:border-rose-400 dark:hover:border-rose-700">
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-200 dark:bg-rose-900/50 flex items-center justify-center border border-rose-400 dark:border-rose-700 shrink-0">
+                            <i class="fa-solid fa-landmark text-rose-700 dark:text-rose-400 text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-rose-950 dark:text-rose-50 mb-1">Orígenes y Evolución</h3>
+                            <p class="text-rose-700/80 dark:text-rose-200/60 text-xs sm:text-sm">Evolución desde el refugio primitivo hasta el mundo clásico.</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-rose-600 dark:text-rose-400 group-hover:translate-x-1 transition-all ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </template>
+
+    <template data-route="#glosario">
+        <div class="animate-fade-in space-y-6 sm:space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
+                        <i class="fa-solid fa-book-bookmark text-amber-500"></i> Glosario de Arquitectura
+                    </h1>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2 text-sm sm:text-base">Conceptos fundamentales de diseño, espacio y composición.</p>
+                </div>
+                <div class="w-full md:w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm focus-within:ring-2 focus-within:ring-amber-500 transition-shadow">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                    <input type="text" id="search-input" placeholder="Buscar concepto..." class="w-full bg-transparent border-none outline-none text-slate-800 dark:text-slate-200 text-sm placeholder-slate-400 font-medium">
+                </div>
+            </div>
+            <div id="glosario-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
+            <div id="empty-state-glosario" class="hidden flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
+                <i class="fa-solid fa-ghost text-5xl mb-4 opacity-50"></i>
+                <p class="text-base font-bold text-center">No se encontraron conceptos con esa palabra.</p>
+            </div>
+        </div>
+    </template>
+
+    <template data-route="#horario">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 items-start animate-fade-in">
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
+                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Lunes</h3>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '09:30 - 10:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">09:30 - 10:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '10:30 - 11:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">10:30 - 11:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '11:30 - 12:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">11:30 - 12:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '12:30 - 13:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">12:30 - 13:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '13:15 - 14:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm mt-1 cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">13:15 - 14:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="mt-1 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">Profs: F. Martinez, Y. Alvarez</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
+                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Martes</h3>
+                <div onclick="openClassModal('Estructuras 1: Matemáticas', '14:15 - 15:00', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-blue-100 border border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/50 p-3 sm:p-4 rounded-xl shadow-sm mt-0 lg:mt-[310px] cursor-pointer hover:bg-blue-200 hover:border-blue-400 dark:hover:bg-blue-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 mb-1 tracking-widest uppercase">14:15 - 15:00</div>
+                    <div class="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-50 leading-tight">Estructuras 1: Matemáticas</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-blue-700/80 dark:text-blue-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Estructuras 1: Matemáticas', '15:15 - 16:00', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-blue-100 border border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-200 hover:border-blue-400 dark:hover:bg-blue-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 mb-1 tracking-widest uppercase">15:15 - 16:00</div>
+                    <div class="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-50 leading-tight">Estructuras 1: Matemáticas</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-blue-700/80 dark:text-blue-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                </div>
+                <div class="mt-1 mb-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">Prof: Mauro F. Robles</span>
+                </div>
+                <div onclick="openClassModal('Comunicación 1', '16:15 - 17:00', 'Sala Taller 3', 'SERGIO TRABUCCO', 'purple')" class="bg-purple-100 border border-purple-300 dark:bg-purple-950/30 dark:border-purple-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-purple-200 hover:border-purple-400 dark:hover:bg-purple-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-400 mb-1 tracking-widest uppercase">16:15 - 17:00</div>
+                    <div class="text-xs sm:text-sm font-bold text-purple-950 dark:text-purple-50 leading-tight">Comunicación 1</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-purple-700/80 dark:text-purple-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 3</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Comunicación 1', '17:15 - 18:00', 'Sala Taller 3', 'SERGIO TRABUCCO', 'purple')" class="bg-purple-100 border border-purple-300 dark:bg-purple-950/30 dark:border-purple-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-purple-200 hover:border-purple-400 dark:hover:bg-purple-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-400 mb-1 tracking-widest uppercase">17:15 - 18:00</div>
+                    <div class="text-xs sm:text-sm font-bold text-purple-950 dark:text-purple-50 leading-tight">Comunicación 1</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-purple-700/80 dark:text-purple-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 3</div>
+                </div>
+                <div class="mt-1 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">Prof: Sergio Trabucco</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
+                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Miércoles</h3>
+                <div onclick="openClassModal('Representación 1: Composición', '09:30 - 10:15', 'Sala Taller 1', 'ALBERTO ALEJANDRO MANCILLA CARRILLO', 'emerald')" class="bg-emerald-100 border border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-emerald-200 hover:border-emerald-400 dark:hover:bg-emerald-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mb-1 tracking-widest uppercase">09:30 - 10:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-50 leading-tight">Representación 1: Composición</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-emerald-700/80 dark:text-emerald-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Representación 1: Composición', '10:30 - 11:15', 'Sala Taller 1', 'ALBERTO ALEJANDRO MANCILLA CARRILLO', 'emerald')" class="bg-emerald-100 border border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-emerald-200 hover:border-emerald-400 dark:hover:bg-emerald-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mb-1 tracking-widest uppercase">10:30 - 11:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-50 leading-tight">Representación 1: Composición</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-emerald-700/80 dark:text-emerald-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="mt-1 mb-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">Prof: Alberto A. Mancilla</span>
+                </div>
+                <div onclick="openClassModal('Estructuras 1: Matemáticas', '11:30 - 12:15', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-blue-100 border border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-200 hover:border-blue-400 dark:hover:bg-blue-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 mb-1 tracking-widest uppercase">11:30 - 12:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-50 leading-tight">Estructuras 1: Matemáticas</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-blue-700/80 dark:text-blue-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Estructuras 1: Matemáticas', '12:30 - 13:15', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-blue-100 border border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-200 hover:border-blue-400 dark:hover:bg-blue-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 mb-1 tracking-widest uppercase">12:30 - 13:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-50 leading-tight">Estructuras 1: Matemáticas</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-blue-700/80 dark:text-blue-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
+                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Jueves</h3>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '09:30 - 10:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">09:30 - 10:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '10:30 - 11:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">10:30 - 11:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '11:30 - 12:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">11:30 - 12:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '12:30 - 13:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">12:30 - 13:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '13:15 - 14:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm mt-1 cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">13:15 - 14:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
+                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Viernes</h3>
+                <div onclick="openClassModal('Arquitectura 1: Clásica', '11:30 - 12:15', 'Sala 2', 'DENISE ANNE ENGLER TAYLOR', 'rose')" class="bg-rose-100 border border-rose-300 dark:bg-rose-950/30 dark:border-rose-800/50 p-3 sm:p-4 rounded-xl shadow-sm mt-0 lg:mt-[155px] cursor-pointer hover:bg-rose-200 hover:border-rose-400 dark:hover:bg-rose-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-rose-700 dark:text-rose-400 mb-1 tracking-widest uppercase">11:30 - 12:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-rose-950 dark:text-rose-50 leading-tight">Arquitectura 1: Clásica</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-rose-700/80 dark:text-rose-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                </div>
+                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
+                <div onclick="openClassModal('Arquitectura 1: Clásica', '12:30 - 13:15', 'Sala 2', 'DENISE ANNE ENGLER TAYLOR', 'rose')" class="bg-rose-100 border border-rose-300 dark:bg-rose-950/30 dark:border-rose-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-rose-200 hover:border-rose-400 dark:hover:bg-rose-900/40 transition-all">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-rose-700 dark:text-rose-400 mb-1 tracking-widest uppercase">12:30 - 13:15</div>
+                    <div class="text-xs sm:text-sm font-bold text-rose-950 dark:text-rose-50 leading-tight">Arquitectura 1: Clásica</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-rose-700/80 dark:text-rose-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                </div>
+                <div class="mt-1 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">Prof: Denise A. Engler</span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template data-route="#tareas">
+        <div class="animate-fade-in space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="bg-amber-500 text-slate-900 p-1.5 rounded shadow-sm">
+                        <i class="fa-solid fa-list-check text-base sm:text-lg"></i>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Panel de Entregas</h2>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full xl:w-auto">
+                    <button id="btn-export-tasks" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 text-xs sm:text-sm rounded-lg px-3 py-2 font-bold shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-file-export"></i> <span class="hidden md:inline">Exportar</span>
+                    </button>
+                    <label for="file-import-tasks" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 text-xs sm:text-sm rounded-lg px-3 py-2 font-bold shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer mb-0">
+                        <i class="fa-solid fa-file-import"></i> <span class="hidden md:inline">Importar</span>
+                    </label>
+                    <input type="file" id="file-import-tasks" accept=".txt" class="hidden">
+                    
+                    <select id="filter-status" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-lg px-3 py-2 outline-none font-bold shadow-sm cursor-pointer ml-auto xl:ml-0">
+                        <option value="all">Todos los estados</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="progress">En Progreso</option>
+                        <option value="completed">Lista</option>
+                    </select>
+                    <select id="filter-subject" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-lg px-3 py-2 outline-none font-bold shadow-sm cursor-pointer">
+                        <option value="all">Todas las materias</option>
+                        <option value="Proyectos 1">Proyectos 1</option>
+                        <option value="Estructuras 1">Estructuras 1</option>
+                        <option value="Comunicación 1">Comunicación 1</option>
+                        <option value="Representación 1">Representación 1</option>
+                        <option value="Arquitectura 1">Arquitectura 1</option>
+                        <option value="General">General</option>
+                    </select>
+                    <button id="btn-new-task" class="bg-amber-500 hover:bg-amber-600 border border-amber-600 text-slate-900 font-bold text-xs sm:text-sm px-4 py-2 rounded-lg shadow-sm transition-colors flex items-center gap-2 w-full sm:w-auto justify-center">
+                        <i class="fa-solid fa-plus"></i> Nueva
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 sm:p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-700 pb-3">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-regular fa-calendar-days text-amber-500"></i> <span id="calendar-month-year" class="capitalize">Mes Año</span>
+                    </h3>
+                    <div class="flex gap-2">
+                        <button id="btn-prev-month" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center border border-slate-200 dark:border-slate-700"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                        <button id="btn-next-month" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center border border-slate-200 dark:border-slate-700"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[9px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                    <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2 auto-rows-fr"></div>
+            </div>
+
+            <div id="active-date-indicator" class="hidden flex justify-between items-center bg-amber-100 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-800/50 p-3 rounded-xl text-amber-800 dark:text-amber-400 text-sm font-bold shadow-sm">
+                <span><i class="fa-solid fa-filter mr-2"></i> Filtrando por fecha: <span id="active-date-text"></span></span>
+                <button onclick="filterByDate(null)" class="hover:text-amber-600 dark:hover:text-amber-200 px-2 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div id="view-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 items-start mt-4"></div>
+            <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl">
+                <i class="fa-solid fa-clipboard-check text-5xl mb-4 opacity-50"></i>
+                <p class="text-base font-bold text-center px-4">No se encontraron tareas con estos filtros.</p>
+            </div>
+        </div>
+    </template>
+
+    <template data-route="#proyectos_1">
+        <div class="animate-fade-in space-y-4">
+            <div class="flex items-center gap-2 sm:gap-3 mb-6">
+                <div class="bg-amber-500 text-slate-900 p-1.5 rounded shadow-sm">
+                    <i class="fa-solid fa-folder-open text-base sm:text-lg"></i>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Directorio de Unidades</h2>
+            </div>
+            <div id="contenedor-unidades" class="space-y-3 sm:space-y-4"></div>
+        </div>
+    </template>
+
+    <template data-route="#estructuras_1">
+        <div class="animate-fade-in space-y-4">
+            <div class="flex items-center gap-2 sm:gap-3 mb-6">
+                <div class="bg-blue-500 text-white p-1.5 rounded shadow-sm">
+                    <i class="fa-solid fa-folder-open text-base sm:text-lg"></i>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Directorio Estructuras 1</h2>
+            </div>
+            <div class="space-y-3 sm:space-y-4">
+                <a href="#conjuntos" class="bg-blue-100 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-800/50 rounded-xl p-4 sm:p-6 flex items-center justify-between group block transition-all max-w-4xl hover:shadow-md hover:-translate-y-1 hover:border-blue-400 dark:hover:border-blue-700">
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-200 dark:bg-blue-900/50 flex items-center justify-center border border-blue-400 dark:border-blue-700 shrink-0">
+                            <i class="fa-solid fa-cubes text-blue-700 dark:text-blue-400 text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-blue-950 dark:text-blue-50 mb-1">Teoría de Conjuntos</h3>
+                            <p class="text-blue-700/80 dark:text-blue-200/60 text-xs sm:text-sm">Conceptos básicos, operaciones matemáticas y evaluación de pertenencia.</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-all ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </template>
+
+    <template data-route="#origenes_y_evolucion">
+        <div class="animate-fade-in w-full space-y-12">
+            <section class="flex flex-col lg:flex-row gap-8 items-center border-b border-slate-200 dark:border-slate-800 pb-10">
+                <div class="w-full lg:w-1/2 space-y-4">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
+                        Orígenes y <span class="text-rose-600 dark:text-rose-500">Evolución</span>
+                    </h1>
+                    <p class="text-slate-600 dark:text-slate-400 text-lg">
+                        La arquitectura emerge de una necesidad básica y evoluciona como un acto social. Su desarrollo histórico refleja las variaciones en la percepción humana del espacio, la trascendencia y el control territorial a través de tres paradigmas fundamentales.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/50 p-3 rounded-lg flex items-center gap-3">
+                            <i class="fa-solid fa-shield-halved text-rose-500 text-xl"></i>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-rose-500 tracking-wider">Origen Físico</p>
+                                <p class="font-bold text-sm text-slate-800 dark:text-slate-200">Seguridad y Límite</p>
+                            </div>
+                        </div>
+                        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-3 rounded-lg flex items-center gap-3">
+                            <i class="fa-solid fa-sun text-amber-500 text-xl"></i>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Origen Psicológico</p>
+                                <p class="font-bold text-sm text-slate-800 dark:text-slate-200">Religión y Trascendencia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-800 p-5 rounded-xl text-center shadow-sm">
+                        <span class="block text-3xl mb-2 font-serif font-black text-amber-600 dark:text-amber-500">I</span>
+                        <h4 class="font-bold text-slate-900 dark:text-white text-base mb-1">Egipto</h4>
+                        <p class="text-[10px] text-slate-600 dark:text-slate-400 uppercase tracking-widest">Eje Espiritual</p>
+                    </div>
+                    <div class="bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-800 p-5 rounded-xl text-center shadow-sm">
+                        <span class="block text-3xl mb-2 font-serif font-black text-blue-600 dark:text-blue-500">II</span>
+                        <h4 class="font-bold text-slate-900 dark:text-white text-base mb-1">Grecia</h4>
+                        <p class="text-[10px] text-slate-600 dark:text-slate-400 uppercase tracking-widest">Proporción Humana</p>
+                    </div>
+                    <div class="bg-rose-100 dark:bg-rose-900/30 border border-rose-300 dark:border-rose-800 p-5 rounded-xl text-center shadow-sm">
+                        <span class="block text-3xl mb-2 font-serif font-black text-rose-600 dark:text-rose-500">III</span>
+                        <h4 class="font-bold text-slate-900 dark:text-white text-base mb-1">Roma</h4>
+                        <p class="text-[10px] text-slate-600 dark:text-slate-400 uppercase tracking-widest">Poder Imperial</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white border-b-2 border-amber-500 inline-block pb-1">Egipto: La Dimensión Espiritual (2900 a.C. - 540 d.C.)</h2>
+                <p class="text-slate-600 dark:text-slate-400 max-w-3xl">La configuración arquitectónica obedece a la geografía y los ciclos del río Nilo. Se concibe como un medio para conferir sentido a la existencia, ofreciendo consuelo frente a la muerte mediante la representación de la vida eterna.</p>
+                
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-amber-400 dark:hover:border-amber-600 transition-colors">
+                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
+                            <svg viewBox="0 0 100 100" class="w-full h-auto max-w-[120px]">
+                                <line x1="50" y1="0" x2="10" y2="90" stroke="#f59e0b" stroke-width="2" class="svg-ray opacity-0 group-hover:opacity-100" />
+                                <line x1="50" y1="0" x2="30" y2="90" stroke="#f59e0b" stroke-width="2" class="svg-ray opacity-0 group-hover:opacity-100" />
+                                <line x1="50" y1="0" x2="50" y2="90" stroke="#f59e0b" stroke-width="2" class="svg-ray opacity-0 group-hover:opacity-100" />
+                                <line x1="50" y1="0" x2="70" y2="90" stroke="#f59e0b" stroke-width="2" class="svg-ray opacity-0 group-hover:opacity-100" />
+                                <line x1="50" y1="0" x2="90" y2="90" stroke="#f59e0b" stroke-width="2" class="svg-ray opacity-0 group-hover:opacity-100" />
+                                <polygon points="10,90 90,90 50,30" class="fill-slate-300 dark:fill-slate-700 stroke-slate-400 dark:stroke-slate-600" stroke-width="1" />
+                                <polygon points="40,45 60,45 50,30" class="fill-amber-400 dark:fill-amber-500 transition-all duration-500 group-hover:fill-amber-300" />
+                            </svg>
+                        </div>
+                        <div class="w-full sm:w-2/3 space-y-3">
+                            <h3 class="text-lg font-bold text-amber-700 dark:text-amber-500 flex items-center gap-2"><i class="fa-solid fa-caret-up"></i> Rayos Solares de Piedra</h3>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">Las pirámides actúan como hitos verticales dentro de un horizonte predominantemente plano. Su desarrollo formal tiene un fundamento simbólico estricto:</p>
+                            <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+                                <li>• <strong>Escalonamiento:</strong> Mecanismo físico y simbólico para el ascenso al cielo.</li>
+                                <li>• <strong>Punta Dorada:</strong> Materialización de los rayos del Sol cayendo sobre la tierra.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-amber-400 dark:hover:border-amber-600 transition-colors">
+                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
+                            <div class="w-full h-24 border-2 border-slate-300 dark:border-slate-600 relative overflow-hidden flex flex-col justify-between p-2">
+                                <div class="h-2 w-full bg-slate-300 dark:bg-slate-600"></div>
+                                <div class="flex justify-between w-full h-14">
+                                    <div class="w-2 h-full bg-amber-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                    <div class="w-2 h-full bg-amber-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                    <div class="w-2 h-full bg-amber-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                    <div class="w-2 h-full bg-amber-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                </div>
+                                <div class="h-2 w-full bg-slate-300 dark:bg-slate-600"></div>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-2/3 space-y-3">
+                            <h3 class="text-lg font-bold text-amber-700 dark:text-amber-500 flex items-center gap-2"><i class="fa-solid fa-arrows-up-down"></i> Ejes y Columnas</h3>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">Surge el uso de la columna como soporte estructural de la cubierta. Su disposición determina el ordenamiento axial del espacio.</p>
+                            <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+                                <li>• <strong>Disposición Axial:</strong> Línea directriz entre templo funerario y santuario.</li>
+                                <li>• <strong>Recorrido:</strong> Transiciones secuenciales mediante rampas, avenidas y esfinges.</li>
+                                <li>• <strong>Ornamentación:</strong> Referencias naturales (Loto, Papiro).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white border-b-2 border-blue-500 inline-block pb-1">Grecia Clásica: La Medida Humana (800 - 30 a.C.)</h2>
+                <p class="text-slate-600 dark:text-slate-400 max-w-3xl">La arquitectura se subordina a un orden matemático accesible. Desplaza la monumentalidad aplastante por la moderación basada en las proporciones del cuerpo humano.</p>
+                
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 space-y-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 p-5 rounded-xl h-full flex flex-col justify-center">
+                            <div class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl mb-4">
+                                <i class="fa-solid fa-person-rays"></i>
+                            </div>
+                            <h3 class="font-bold text-blue-900 dark:text-blue-100 mb-2">Hombre de Vitruvio / Modulor</h3>
+                            <p class="text-sm text-slate-700 dark:text-slate-300 mb-4">La defensa de la polis reside en los ciudadanos. Las proporciones arquitectónicas derivan de la escala del cuerpo humano, estableciendo un estándar racional.</p>
+                            <ul class="text-[11px] uppercase tracking-wider font-bold text-blue-700 dark:text-blue-400 space-y-2 mt-auto">
+                                <li class="border-l-2 border-blue-400 pl-2">Libertad del Individuo</li>
+                                <li class="border-l-2 border-blue-400 pl-2">Ciencia Matemática Accesible</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm flex flex-col group cursor-pointer hover:border-blue-400 dark:hover:border-blue-600 transition-colors">
+                        <div class="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-5 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">La Desaparición de la Claridad</h3>
+                                <p class="text-xs text-slate-500">Partenón (Ictino, Calícrates, Fidias)</p>
+                            </div>
+                            <i class="fa-solid fa-eye text-blue-500 opacity-50 group-hover:opacity-100 transition-opacity text-xl"></i>
+                        </div>
+                        <div class="p-6 flex flex-col sm:flex-row gap-8 items-center grow">
+                            <div class="w-full sm:w-3/5 space-y-3">
+                                <p class="text-sm text-slate-700 dark:text-slate-300">Punto álgido de la arquitectura clásica griega. Diseñado para su lectura exterior mediante la implementación de correcciones ópticas para mitigar deformaciones visuales.</p>
+                                <div class="space-y-2 mt-4">
+                                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
+                                        <span class="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Ausencia de Líneas Rectas</span>
+                                        <span class="text-xs text-slate-600 dark:text-slate-400">Curvaturas horizontales en el crepidoma y entablamento.</span>
+                                    </div>
+                                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
+                                        <span class="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Inclinación Perimetral</span>
+                                        <span class="text-xs text-slate-600 dark:text-slate-400">Muros y columnas levemente inclinados hacia el interior.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full sm:w-2/5 flex flex-col items-center justify-center">
+                                <div class="relative w-16 h-32 bg-slate-200 dark:bg-slate-700 border-x-4 border-slate-400 dark:border-slate-500 entasis-column flex items-center justify-center">
+                                    <div class="absolute -top-2 w-20 h-2 bg-slate-400 dark:bg-slate-500"></div>
+                                    <div class="absolute -bottom-2 w-20 h-2 bg-slate-400 dark:bg-slate-500"></div>
+                                    <span class="text-[10px] font-bold text-blue-700 dark:text-blue-300 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity -rotate-90 block">Éntasis</span>
+                                </div>
+                                <p class="text-[10px] text-center text-slate-500 mt-4 max-w-[150px]">Pase el cursor para visualizar el engrosamiento del fuste.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white border-b-2 border-rose-500 inline-block pb-1">Imperio Romano: Poder y Expansionismo (300 a.C. - 300 d.C.)</h2>
+                <p class="text-slate-600 dark:text-slate-400 max-w-3xl">La arquitectura se instrumentaliza como símbolo de dominio. Asimila la herencia griega y los desarrollos ingenieriles etruscos, priorizando la monumentalidad espacial interna y la infraestructura cívica.</p>
+                
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-rose-400 dark:hover:border-rose-600 transition-colors">
+                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-100 dark:border-slate-800 h-32">
+                            <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
+                                <rect x="10" y="30" width="15" height="30" class="fill-slate-300 dark:fill-slate-600" />
+                                <rect x="75" y="30" width="15" height="30" class="fill-slate-300 dark:fill-slate-600" />
+                                <path d="M 10 30 A 40 40 0 0 1 25 10 L 35 25 A 20 20 0 0 0 25 30 Z" class="fill-slate-400 dark:fill-slate-500 stroke-slate-50 dark:stroke-slate-900 arch-stone" />
+                                <path d="M 25 10 A 40 40 0 0 1 45 2 L 50 20 A 20 20 0 0 0 35 25 Z" class="fill-slate-400 dark:fill-slate-500 stroke-slate-50 dark:stroke-slate-900 arch-stone" />
+                                <path d="M 45 2 A 40 40 0 0 1 55 2 L 55 20 A 20 20 0 0 0 45 20 Z" class="fill-slate-500 dark:fill-slate-400 stroke-slate-50 dark:stroke-slate-900 arch-stone delay-75" />
+                                <path d="M 55 2 A 40 40 0 0 1 75 10 L 65 25 A 20 20 0 0 0 50 20 Z" class="fill-slate-400 dark:fill-slate-500 stroke-slate-50 dark:stroke-slate-900 arch-stone" />
+                                <path d="M 75 10 A 40 40 0 0 1 90 30 L 75 30 A 20 20 0 0 0 65 25 Z" class="fill-slate-400 dark:fill-slate-500 stroke-slate-50 dark:stroke-slate-900 arch-stone" />
+                            </svg>
+                        </div>
+                        <div class="w-full sm:w-2/3 space-y-3">
+                            <h3 class="text-lg font-bold text-rose-700 dark:text-rose-500 flex items-center gap-2">El Arco y el Hormigón</h3>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">Quiebre estructural frente a la columna griega. El arco introduce un efecto de movimiento dinámico y repetitivo en expansión.</p>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 p-2 rounded"><strong>Hormigón:</strong> Amalgama de cal, mampuesto, agua y roca volcánica. Permite la ejecución técnica de bóvedas y cúpulas de luz inédita.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl shadow-sm space-y-4">
+                        <h3 class="text-lg font-bold text-rose-700 dark:text-rose-500 flex items-center gap-2"><i class="fa-solid fa-city"></i> Urbanismo y Apariencia</h3>
+                        <div class="space-y-3">
+                            <div class="border-l-2 border-rose-500 pl-3">
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Tipologías Cívicas</h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Desarrollo del Foro público (perfeccionamiento del ágora), termas, teatros, acueductos y anfiteatros.</p>
+                            </div>
+                            <div class="border-l-2 border-slate-300 dark:border-slate-600 pl-3">
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Apariencia vs Realidad</h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Primacía de la representación sobre la verdad material. Revestimientos de mármol ocultan estructuras utilitarias subyacentes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </template>
+
+    <template data-route="#conjuntos">
+        <div class="animate-fade-in w-full space-y-10">
+            <section class="flex flex-col lg:flex-row gap-8 items-center">
+                <div class="w-full lg:w-1/2 space-y-4">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
+                        El Lenguaje de la <span class="text-blue-600 dark:text-blue-400">Agrupación</span>
+                    </h1>
+                    <p class="text-slate-600 dark:text-slate-400 text-lg">
+                        La Teoría de Conjuntos, formalizada por <strong>George Cantor</strong>, es la base de las matemáticas modernas. Nos permite clasificar, operar y entender agrupaciones de elementos, desde números hasta conceptos espaciales abstractos.
+                    </p>
+                    <div class="flex gap-4 pt-2">
+                        <div class="bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-800 p-3 rounded-lg flex items-center gap-3 w-1/2">
+                            <i class="fa-solid fa-infinity text-blue-500 text-2xl"></i>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-blue-500">Pionero</p>
+                                <p class="font-bold text-sm text-slate-800 dark:text-slate-200">George Cantor</p>
+                            </div>
+                        </div>
+                        <div class="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-800 p-3 rounded-lg flex items-center gap-3 w-1/2">
+                            <i class="fa-solid fa-layer-group text-amber-500 text-2xl"></i>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-amber-500">Concepto Clave</p>
+                                <p class="font-bold text-sm text-slate-800 dark:text-slate-200">Agrupar similares</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-lg relative overflow-hidden flex justify-center items-center h-64">
+                    <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-700/[0.2] bg-[size:20px_20px]"></div>
+                    <svg width="240" height="160" viewBox="0 0 240 160" class="relative z-10">
+                        <circle cx="90" cy="80" r="60" fill="#3b82f6" fill-opacity="0.4" stroke="#2563eb" stroke-width="2" class="venn-circle" id="venn-A"/>
+                        <circle cx="150" cy="80" r="60" fill="#f59e0b" fill-opacity="0.4" stroke="#d97706" stroke-width="2" class="venn-circle" id="venn-B"/>
+                        <text x="50" y="85" font-family="Arial" font-size="20" font-weight="bold" fill="currentColor" class="text-slate-800 dark:text-white">A</text>
+                        <text x="180" y="85" font-family="Arial" font-size="20" font-weight="bold" fill="currentColor" class="text-slate-800 dark:text-white">B</text>
+                        <text x="110" y="85" font-family="Arial" font-size="20" font-weight="bold" fill="currentColor" class="text-slate-800 dark:text-white">A∩B</text>
+                    </svg>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white border-b-2 border-blue-500 inline-block pb-1">Diccionario Básico</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="interactive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl transition-all">
+                        <div class="text-2xl font-black text-blue-500 mb-2">{ }</div>
+                        <h3 class="font-bold text-lg mb-1">Conjunto</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Delimitador para agrupar elementos.</p>
+                    </div>
+                    <div class="interactive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl transition-all">
+                        <div class="text-2xl font-black text-blue-500 mb-2">/</div>
+                        <h3 class="font-bold text-lg mb-1">Tal que</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Establece una condición que deben cumplir los elementos.</p>
+                    </div>
+                    <div class="interactive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl transition-all">
+                        <div class="text-2xl font-black text-emerald-500 mb-2">$\in$</div>
+                        <h3 class="font-bold text-lg mb-1">Pertenece</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Indica que un elemento es parte del conjunto.</p>
+                    </div>
+                    <div class="interactive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl transition-all">
+                        <div class="text-2xl font-black text-red-500 mb-2">$\notin$</div>
+                        <h3 class="font-bold text-lg mb-1">No Pertenece</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Indica que un elemento NO es parte del conjunto.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-blue-100 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-800 p-6 rounded-2xl shadow-sm">
+                    <h3 class="text-xl font-bold text-blue-900 dark:text-blue-100 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-shapes"></i> Tipos y Operaciones
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                            <span class="w-8 h-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-bold rounded">$U$</span>
+                            <div><strong class="text-slate-800 dark:text-slate-200">Universo:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">El conjunto que contiene todos los elementos en un contexto dado.</span></div>
+                        </li>
+                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                            <span class="w-8 h-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-bold rounded">$\emptyset$</span>
+                            <div><strong class="text-slate-800 dark:text-slate-200">Conjunto Vacío:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">No contiene ningún elemento.</span></div>
+                        </li>
+                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                            <span class="w-8 h-8 flex items-center justify-center bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 font-bold rounded">$\cup$</span>
+                            <div><strong class="text-slate-800 dark:text-slate-200">Unión:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Agrupa todos los elementos de ambos conjuntos.</span></div>
+                        </li>
+                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                            <span class="w-8 h-8 flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 font-bold rounded">$\cap$</span>
+                            <div><strong class="text-slate-800 dark:text-slate-200">Intersección:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Elementos que existen en ambos conjuntos a la vez.</span></div>
+                        </li>
+                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                            <span class="w-8 h-8 flex items-center justify-center bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 font-bold rounded">$A'$</span>
+                            <div><strong class="text-slate-800 dark:text-slate-200">Complemento:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Todo lo que está en el Universo pero NO en A.</span></div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4 border-b border-slate-300 dark:border-slate-600 pb-2">Símbolos Lógicos</h3>
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center justify-between p-2 hover:bg-white dark:hover:bg-slate-700 rounded transition-colors">
+                                <span class="font-mono text-xl text-blue-500 font-bold">$\dots$</span>
+                                <span class="text-sm text-slate-600 dark:text-slate-300">El conjunto continúa infinitamente</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 hover:bg-white dark:hover:bg-slate-700 rounded transition-colors">
+                                <span class="font-mono text-xl text-blue-500 font-bold">$\Rightarrow$</span>
+                                <span class="text-sm text-slate-600 dark:text-slate-300">"Entonces" (Implicación)</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 hover:bg-white dark:hover:bg-slate-700 rounded transition-colors">
+                                <span class="font-mono text-xl text-blue-500 font-bold">$\Leftrightarrow$</span>
+                                <span class="text-sm text-slate-600 dark:text-slate-300">"Si y solo si" (Equivalencia)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                     <div class="bg-gradient-to-r from-amber-200 to-amber-100 dark:from-amber-900/40 dark:to-slate-800 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm">
+                        <p class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">Dato Geométrico Extra</p>
+                        <p class="text-sm text-slate-700 dark:text-slate-300">La relación entre la circunferencia ($C$) y su diámetro ($D$) es constante: <strong class="text-lg font-serif">$\frac{C}{D} = \pi = 3,1415\dots$</strong></p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white border-b-2 border-emerald-500 inline-block pb-1 mb-6">El Ecosistema Numérico</h2>
+                <p class="text-slate-600 dark:text-slate-400 mb-6">Pasa el cursor sobre cada conjunto para ver cómo se relacionan y ejemplos de los números que contienen.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <div class="group relative cursor-pointer interactive-card bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                        <div class="text-3xl font-black text-slate-300 group-hover:text-emerald-500 transition-colors mb-1">N</div>
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Naturales</div>
+                        <div class="absolute inset-0 bg-emerald-500 text-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
+                            <span class="text-sm font-bold mb-1 border-b border-emerald-400 pb-1 w-full text-center">Para Contar</span>
+                            <span class="text-lg font-serif">$1, 2, 3, 4\dots$</span>
+                        </div>
+                    </div>
+
+                    <div class="group relative cursor-pointer interactive-card bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                        <div class="text-3xl font-black text-slate-300 group-hover:text-blue-500 transition-colors mb-1">Z</div>
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Enteros</div>
+                        <div class="absolute inset-0 bg-blue-500 text-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
+                            <span class="text-sm font-bold mb-1 border-b border-blue-400 pb-1 w-full text-center">Positivos y Negativos</span>
+                            <span class="text-lg font-serif">$-3, 0, 1\dots$</span>
+                        </div>
+                    </div>
+
+                    <div class="group relative cursor-pointer interactive-card bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-purple-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                        <div class="text-3xl font-black text-slate-300 group-hover:text-purple-500 transition-colors mb-1">Q</div>
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Racionales</div>
+                        <div class="absolute inset-0 bg-purple-500 text-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
+                            <span class="text-sm font-bold mb-1 border-b border-purple-400 pb-1 w-full text-center">Fracciones y Decimales</span>
+                            <span class="text-base font-serif">$0.125, \frac{2}{4}, 1.33\dots$</span>
+                        </div>
+                    </div>
+
+                    <div class="group relative cursor-pointer interactive-card bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-rose-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                        <div class="text-3xl font-black text-slate-300 group-hover:text-rose-500 transition-colors mb-1">I</div>
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Irracionales</div>
+                        <div class="absolute inset-0 bg-rose-500 text-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
+                            <span class="text-sm font-bold mb-1 border-b border-rose-400 pb-1 w-full text-center">Decimales Infinitos</span>
+                            <span class="text-lg font-serif">$\pi, \sqrt{5}, \sqrt{2}\dots$</span>
+                        </div>
+                    </div>
+
+                    <div class="group relative cursor-pointer interactive-card bg-slate-800 dark:bg-slate-200 border-2 border-slate-800 dark:border-slate-200 hover:border-amber-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                        <div class="text-3xl font-black text-white dark:text-slate-900 group-hover:text-amber-500 transition-colors mb-1">R</div>
+                        <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Reales</div>
+                        <div class="absolute inset-0 bg-amber-500 text-slate-900 rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
+                            <span class="text-sm font-bold mb-1 border-b border-amber-600 pb-1 w-full text-center">Todos juntos</span>
+                            <span class="text-sm font-bold mt-1">N $\cup$ Z $\cup$ Q $\cup$ I</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+                <div class="bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                        <i class="fa-solid fa-language text-blue-500"></i> Dos formas de hablar
+                    </h2>
+                    
+                    <div class="flex items-center bg-slate-200 dark:bg-slate-900 rounded-lg p-1">
+                        <button id="btn-comp" class="px-4 py-1.5 text-sm font-bold rounded-md bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow transition-all">Comprensión</button>
+                        <button id="btn-ext" class="px-4 py-1.5 text-sm font-bold rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all">Extensión</button>
+                    </div>
+                </div>
+                
+                <div class="p-6 relative min-h-[250px]">
+                    <div id="content-comp" class="transition-opacity duration-300 absolute inset-0 p-6">
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4 border-l-4 border-blue-500 pl-3">Define los conjuntos mediante una <strong>regla o condición</strong> lógica.</p>
+                        <ul class="space-y-4 font-serif text-lg text-slate-800 dark:text-slate-200">
+                            <li class="flex items-center gap-4"><i class="fa-solid fa-arrow-right text-blue-300 text-sm"></i> $B=\{x\in Z/-5\le x\le5\}$</li>
+                            <li class="flex items-center gap-4"><i class="fa-solid fa-arrow-right text-blue-300 text-sm"></i> $D=\{x/x=\frac{n}{n+1},n\in N,n\le10\}$</li>
+                            <li class="flex items-center gap-4"><i class="fa-solid fa-arrow-right text-blue-300 text-sm"></i> $A=\{x\in N/x=2n,n\le8\}$</li>
+                            <li class="flex items-center gap-4"><i class="fa-solid fa-arrow-right text-blue-300 text-sm"></i> $C=\{X=3^{n}/n\in Z,n\ge0\}$</li>
+                        </ul>
+                    </div>
+
+                    <div id="content-ext" class="transition-opacity duration-300 absolute inset-0 p-6 opacity-0 pointer-events-none">
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4 border-l-4 border-amber-500 pl-3">Define los conjuntos <strong>enumerando cada uno</strong> de sus elementos explícitamente.</p>
+                        <ul class="space-y-4 font-serif text-lg text-slate-800 dark:text-slate-200">
+                            <li class="flex items-center gap-4"><i class="fa-solid fa-arrow-right text-amber-300 text-sm"></i> $B=\{-5,-4,-3,-2,-1,0,1,2,3,4,5\}$</li>
+                            <li class="flex items-center gap-4"><i class="fa-solid fa-arrow-right text-amber-300 text-sm"></i> $D=\{\frac{1}{2},\frac{2}{3},\frac{3}{4},\frac{4}{5},\frac{5}{6},\frac{6}{7},\frac{4}{8},\frac{8}{9},\frac{9}{10},\frac{10}{11}\}$</li>
+                            <li class="flex items-center gap-4"><i class="fa-solid fa-arrow-right text-amber-300 text-sm"></i> $A=\{2,4,6,8\}$</li>
+                            <li class="flex items-center gap-4"><i class="fa-solid fa-arrow-right text-amber-300 text-sm"></i> $C=\{1,3,9,24,81\dots\}$</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-blue-600 dark:bg-blue-900 text-white rounded-2xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-check-double text-9xl"></i>
+                </div>
+                
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold mb-2">Evaluación de Pertenencia</h2>
+                    <div class="bg-blue-700/50 dark:bg-blue-950/50 p-3 rounded-lg inline-block mb-6 border border-blue-400/30">
+                        <p class="font-mono text-sm">Dados: <strong>$A=\{1,2,5\}$</strong> y <strong>$B=\{A,e,i,o\}$</strong></p>
+                    </div>
+                    
+                    <p class="text-blue-100 text-sm mb-4">¿Son verdaderas o falsas las siguientes afirmaciones?</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="bg-white text-slate-800 p-3 rounded-xl shadow-sm flex justify-between items-center group">
+                            <span class="font-serif text-lg">$2\in A$</span>
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">V</span>
+                        </div>
+                        <div class="bg-white text-slate-800 p-3 rounded-xl shadow-sm flex justify-between items-center group">
+                            <span class="font-serif text-lg">$5\in B$</span>
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">V</span>
+                        </div>
+                        <div class="bg-white text-slate-800 p-3 rounded-xl shadow-sm flex justify-between items-center group cursor-help relative" title="Falso, 'i' SÍ pertenece a B">
+                            <span class="font-serif text-lg">$i\notin B$</span>
+                            <span class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">F</span>
+                        </div>
+                        <div class="bg-white text-slate-800 p-3 rounded-xl shadow-sm flex justify-between items-center group cursor-help" title="Falso, U no pertenece a B">
+                            <span class="font-serif text-lg">$U\in B$</span>
+                            <span class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">F</span>
+                        </div>
+                        <div class="bg-white text-slate-800 p-3 rounded-xl shadow-sm flex justify-between items-center group">
+                            <span class="font-serif text-lg">$e\in B$</span>
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">V</span>
+                        </div>
+                        <div class="bg-white text-slate-800 p-3 rounded-xl shadow-sm flex justify-between items-center group">
+                            <span class="font-serif text-lg">$125\notin A$</span>
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">V</span>
+                        </div>
+                        <div class="bg-white text-slate-800 p-3 rounded-xl shadow-sm flex justify-between items-center group cursor-help" title="Falso, 14 NO pertenece a A">
+                            <span class="font-serif text-lg">$14\in A$</span>
+                            <span class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">F</span>
+                        </div>
+                        <div class="bg-white text-slate-800 p-3 rounded-xl shadow-sm flex justify-between items-center group">
+                            <span class="font-serif text-lg">$a\notin A$</span>
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">V</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </template>
+
+    <template data-route="#ritmo_y_movimiento">
+        <div class="animate-fade-in w-full space-y-6 sm:space-y-8">
+            <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
+                <div class="bg-amber-100 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/50 p-5 sm:p-6 rounded-2xl shadow-sm">
+                    <h3 class="text-xl sm:text-2xl font-bold text-amber-950 dark:text-amber-50 mb-2">Ritmo</h3>
+                    <p class="text-amber-800/90 dark:text-amber-200/80 text-xs sm:text-sm mb-4 leading-relaxed">Métrica estática. Repetición estructurada y espaciamiento de elementos en el espacio. Define la frecuencia y el patrón de lectura visual.</p>
+                    <div class="space-y-2 text-xs sm:text-sm text-amber-900 dark:text-amber-100 font-medium">
+                        <p><i class="fa-solid fa-shapes mr-2 text-amber-600 dark:text-amber-500"></i><strong>Elementos:</strong> Módulos repetitivos, intervalos, cadencia.</p>
+                        <p><i class="fa-solid fa-bullseye mr-2 text-amber-600 dark:text-amber-500"></i><strong>Función:</strong> Otorgar orden, proporción y escala.</p>
+                    </div>
+                </div>
+                <div class="bg-blue-100 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-800/50 p-5 sm:p-6 rounded-2xl shadow-sm">
+                    <h3 class="text-xl sm:text-2xl font-bold text-blue-950 dark:text-blue-50 mb-2">Movimiento</h3>
+                    <p class="text-blue-800/90 dark:text-blue-200/80 text-xs sm:text-sm mb-4 leading-relaxed">Dinámica espacial. Fuerza que dirige el recorrido del ojo a través de la geometría, rompiendo la inercia del volumen ortogonal.</p>
+                    <div class="space-y-2 text-xs sm:text-sm text-blue-900 dark:text-blue-100 font-medium">
+                        <p><i class="fa-solid fa-bezier-curve mr-2 text-blue-600 dark:text-blue-500"></i><strong>Elementos:</strong> Tensión diagonal, líneas de fuga, asimetría.</p>
+                        <p><i class="fa-solid fa-route mr-2 text-blue-600 dark:text-blue-500"></i><strong>Función:</strong> Guiar recorridos, aceleración visual.</p>
+                    </div>
+                </div>
+            </div>
+
+            <section class="bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 rounded-2xl shadow-sm">
+                <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                    <div class="bg-amber-500 text-slate-900 p-1.5 rounded shadow-sm"><i class="fa-solid fa-bars-staggered text-sm sm:text-base"></i></div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Ejercicio: Ritmo</h2>
+                </div>
+                <div class="grid lg:grid-cols-4 gap-6 sm:gap-8">
+                    <div class="lg:col-span-1 space-y-4 sm:space-y-6">
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Frecuencia</label>
+                            <input type="range" id="rhythm-freq" min="3" max="20" value="8" class="w-full">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Intervalo</label>
+                            <input type="range" id="rhythm-gap" min="1" max="10" value="4" class="w-full">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Patrón Modulante</label>
+                            <select id="rhythm-pattern" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-xs sm:text-sm rounded-xl focus:ring-2 focus:ring-amber-500 p-3 outline-none">
+                                <option value="uniform">Uniforme (A-A-A-A)</option>
+                                <option value="alternating">Alterno (A-B-A-B)</option>
+                                <option value="progressive">Progresivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3 h-48 sm:h-56 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl grid-pattern relative overflow-hidden flex items-end justify-center p-4 sm:p-6 shadow-inner">
+                        <div id="rhythm-display" class="flex h-full w-full items-end justify-center transition-all duration-300"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 rounded-2xl shadow-sm">
+                <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                    <div class="bg-blue-500 text-slate-900 p-1.5 rounded shadow-sm"><i class="fa-solid fa-wind text-sm sm:text-base"></i></div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Ejercicio: Movimiento</h2>
+                </div>
+                <div class="grid lg:grid-cols-4 gap-6 sm:gap-8">
+                    <div class="lg:col-span-1 space-y-4 sm:space-y-6">
+                        <div>
+                            <div class="flex justify-between text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                                <label>Desviación Axial</label><span id="val-curve" class="text-blue-600 dark:text-blue-400">0</span>
+                            </div>
+                            <input type="range" id="mov-curve" min="-150" max="150" value="0" class="w-full">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                                <label>Apertura</label><span id="val-width" class="text-blue-600 dark:text-blue-400">100%</span>
+                            </div>
+                            <input type="range" id="mov-width" min="20" max="150" value="100" class="w-full">
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3 h-48 sm:h-64 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl grid-pattern relative overflow-hidden p-0 shadow-inner">
+                        <svg viewBox="0 0 800 400" class="w-full h-full">
+                            <path id="svg-flow-1" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8 8" class="opacity-30"><animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite" /></path>
+                            <path id="svg-flow-2" fill="none" stroke="#60a5fa" stroke-width="3" stroke-dasharray="12 12" class="opacity-80"><animate attributeName="stroke-dashoffset" from="150" to="0" dur="1.5s" repeatCount="indefinite" /></path>
+                            <path id="svg-flow-3" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8 8" class="opacity-30"><animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite" /></path>
+                            <path id="svg-wall-top" fill="none" class="stroke-slate-600 dark:stroke-slate-400 transition-colors" stroke-width="4" stroke-linecap="round" />
+                            <path id="svg-wall-bottom" fill="none" class="stroke-slate-600 dark:stroke-slate-400 transition-colors" stroke-width="4" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </template>
+
+    <script src="unidades.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
