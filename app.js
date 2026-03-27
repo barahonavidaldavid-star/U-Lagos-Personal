@@ -799,6 +799,7 @@ window.updateRhythm = function() {
     for (let i = 0; i < freq; i++) {
         const element = document.createElement('div');
         let height = '60%', width = '1.5rem', colorClass = 'bg-slate-300 dark:bg-slate-600 border border-slate-400 dark:border-slate-500';
+
         if (pattern === 'alternating') {
             if (i % 2 === 0) { height = '80%'; width = '2rem'; } 
             else { height = '40%'; width = '1rem'; colorClass = 'bg-amber-400 border border-amber-500 shadow-md shadow-amber-500/20'; }
