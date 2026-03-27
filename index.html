@@ -49,39 +49,93 @@
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen selection:bg-amber-500/30 flex flex-col overflow-y-scroll transition-colors duration-300">
+<body class="bg-slate-200 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen selection:bg-amber-500/30 flex overflow-hidden transition-colors duration-300 relative z-0">
 
-    <header class="bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
-            <div id="breadcrumb" class="text-slate-600 dark:text-slate-400 text-xs sm:text-sm md:text-base font-medium flex items-center gap-2 whitespace-nowrap overflow-x-auto scrollbar-hide"></div>
-            
-            <div class="flex items-center gap-2 sm:gap-4">
-                <button onclick="requestNotif()" class="text-slate-500 hover:text-amber-500 transition-colors hidden sm:block" title="Activar Notificaciones">
-                    <i class="fa-solid fa-bell"></i>
-                </button>
-                <a href="#tareas" id="nav-tareas" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 sm:gap-2 px-2 py-1 border-b-2 border-transparent">
-                    <i class="fa-solid fa-list-check"></i> <span class="hidden sm:inline">Calendario</span>
-                </a>
-                <a href="#horario" id="nav-horario" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 sm:gap-2 px-2 py-1 border-b-2 border-transparent">
-                    <i class="fa-solid fa-calendar-days"></i> <span class="hidden sm:inline">Horario</span>
-                </a>
-                <a href="#glosario" id="nav-glosario" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 sm:gap-2 px-2 py-1 border-b-2 border-transparent">
-                    <i class="fa-solid fa-book-bookmark"></i> <span class="hidden sm:inline">Glosario</span>
-                </a>
-                <button id="theme-toggle" class="p-1.5 sm:p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none transition-colors border border-slate-200 dark:border-slate-700 shadow-sm">
-                    <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon text-base sm:text-lg"></i>
-                    <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun text-base sm:text-lg"></i>
-                </button>
+    <!-- Fondo oscuro para menú móvil -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden sm:hidden"></div>
+
+    <!-- Barra Lateral (Sidebar) -->
+    <aside id="sidebar" class="bg-slate-50/70 dark:bg-slate-950/70 backdrop-blur-2xl border-r border-white/50 dark:border-slate-800/50 transition-all duration-300 fixed sm:relative inset-y-0 left-0 transform -translate-x-full sm:translate-x-0 w-64 shrink-0 flex flex-col z-50">
+        <button id="toggle-sidebar" class="absolute -right-3 top-6 bg-slate-100/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md rounded-full p-1.5 border border-white/50 dark:border-slate-700/50 text-slate-400 hover:text-amber-500 focus:outline-none z-10 hidden sm:block transition-colors">
+            <i class="fa-solid fa-chevron-left text-xs transition-transform duration-300" id="sidebar-icon"></i>
+        </button>
+
+        <!-- Logo -->
+        <div class="p-6 flex justify-start items-center gap-3 overflow-hidden">
+            <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+                <i class="fa-solid fa-landmark text-white text-lg"></i>
             </div>
+            <span class="font-bold text-lg text-slate-900 dark:text-white whitespace-nowrap sidebar-text tracking-tight">BaraVidal</span>
         </div>
-    </header>
-    <main id="app-root" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 w-full space-y-8"></main>
+
+        <!-- Navegación -->
+        <nav class="px-4 pb-6 space-y-1.5 flex-1 overflow-y-auto scrollbar-hide">
+            <a href="#home" id="nav-home" class="sidebar-link flex items-center px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+                <i class="fa-solid fa-chart-pie w-5 text-center shrink-0"></i>
+                <span class="ml-3 font-medium whitespace-nowrap sidebar-text">Portal Principal</span>
+            </a>
+            <a href="#tareas" id="nav-tareas" class="sidebar-link flex items-center px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+                <i class="fa-regular fa-calendar w-5 text-center shrink-0"></i>
+                <span class="ml-3 font-medium flex-1 whitespace-nowrap sidebar-text">Calendario</span>
+            </a>
+            <a href="#horario" id="nav-horario" class="sidebar-link flex items-center px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+                <i class="fa-regular fa-clock w-5 text-center shrink-0"></i>
+                <span class="ml-3 font-medium whitespace-nowrap sidebar-text">Horario</span>
+            </a>
+            <a href="#glosario" id="nav-glosario" class="sidebar-link flex items-center px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+                <i class="fa-solid fa-book-bookmark w-5 text-center shrink-0"></i>
+                <span class="ml-3 font-medium whitespace-nowrap sidebar-text">Glosario</span>
+            </a>
+
+            <!-- Acordeón Asignaturas -->
+            <div class="pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                <button id="toggle-asignaturas" class="w-full flex items-center px-3 py-2.5 rounded-xl transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 focus:outline-none">
+                    <i class="fa-solid fa-layer-group w-5 text-center shrink-0"></i>
+                    <span class="ml-3 font-medium flex-1 text-left whitespace-nowrap sidebar-text">Asignaturas</span>
+                    <i class="fa-solid fa-chevron-down w-4 text-xs transition-transform duration-300 sidebar-text text-slate-400" id="asignaturas-icon"></i>
+                </button>
+                <div id="asignaturas-menu" class="mt-1 ml-5 pl-4 border-l-2 border-slate-100 dark:border-slate-800 space-y-1 overflow-hidden transition-all duration-300" style="max-height: 500px;">
+                    <a href="#proyectos_1" class="sidebar-sublink block px-3 py-2 text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg whitespace-nowrap transition-colors text-sm">Proyectos 1</a>
+                    <a href="#estructuras_1" class="sidebar-sublink block px-3 py-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg whitespace-nowrap transition-colors text-sm">Estructuras 1</a>
+                    <a href="#arquitectura_1" class="sidebar-sublink block px-3 py-2 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg whitespace-nowrap transition-colors text-sm">Arquitectura 1</a>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="p-4 border-t border-white/50 dark:border-slate-800/50">
+             <button id="theme-toggle" class="w-full flex items-center px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all focus:outline-none">
+                <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon w-5 text-center shrink-0"></i>
+                <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun w-5 text-center shrink-0"></i>
+                <span class="ml-3 font-medium whitespace-nowrap sidebar-text text-left flex-1" id="theme-text">Modo Oscuro</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenedor Principal (Hará Scroll internamente) -->
+    <div class="flex-1 flex flex-col h-screen overflow-y-auto scrollbar-hide relative">
+        <header class="bg-slate-50/50 dark:bg-slate-950/50 backdrop-blur-2xl sticky top-0 z-30 border-b border-white/50 dark:border-slate-800/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button id="mobile-menu-btn" class="sm:hidden text-slate-500 hover:text-amber-500 transition-colors focus:outline-none">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button> 
+                </div>
+                
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <button onclick="requestNotif()" class="text-slate-500 hover:text-amber-500 transition-colors" title="Activar Notificaciones">
+                        <i class="fa-solid fa-bell"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main id="app-root" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 w-full space-y-8 pb-20"></main>
+    </div>
 
     <div id="modal-task-form" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-md mx-auto shadow-2xl transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="modal-form-content">
-            <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div class="bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-md mx-auto shadow-2xl transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="modal-form-content">
+            <div class="flex justify-between items-center mb-6 border-b border-white/50 dark:border-slate-800/50 pb-4">
                 <h3 id="modal-form-title" class="text-xl font-bold text-slate-900 dark:text-white">Crear Tarea</h3>
-                <button id="btn-close-form" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors bg-slate-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                <button id="btn-close-form" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors bg-slate-100/50 dark:bg-slate-800/50 rounded-full w-8 h-8 flex items-center justify-center border border-white/50 dark:border-slate-700/50">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -144,10 +198,10 @@
     </div>
 
     <div id="modal-task-details" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-lg shadow-2xl transform scale-95 transition-transform duration-300" id="modal-details-content">
+        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-lg shadow-2xl transform scale-95 transition-transform duration-300" id="modal-details-content">
             <div class="flex justify-between items-start mb-4">
-                <div id="dt-subject" class="px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-widest uppercase border bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"></div>
-                <button id="btn-close-details" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors bg-slate-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                <div id="dt-subject" class="px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-widest uppercase border bg-white/50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 border-white/50 dark:border-slate-700/50"></div>
+                <button id="btn-close-details" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors bg-white/50 dark:bg-slate-800/50 rounded-full w-8 h-8 flex items-center justify-center border border-white/50 dark:border-slate-700/50">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -183,10 +237,10 @@
     </div>
 
     <div id="modal-class-info" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-md mx-auto shadow-2xl transform scale-95 transition-transform duration-300" id="modal-class-content">
+        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-white/50 dark:border-slate-800/50 rounded-2xl p-6 sm:p-8 w-full max-w-[90vw] sm:max-w-md mx-auto shadow-2xl transform scale-95 transition-transform duration-300" id="modal-class-content">
             <div class="flex justify-between items-start mb-4 sm:mb-6">
                 <div id="class-color-indicator" class="px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-widest uppercase mb-2 border">ASIGNATURA</div>
-                <button id="btn-close-class" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 bg-slate-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                <button id="btn-close-class" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 bg-white/50 dark:bg-slate-800/50 rounded-full w-8 h-8 flex items-center justify-center border border-white/50 dark:border-slate-700/50">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
@@ -232,187 +286,166 @@
         <div id="attendance-alert-container" class="mb-6 animate-fade-in hidden"></div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-fade-in">
             <!-- Proyectos 1 -->
-            <div class="bg-amber-100 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-amber-400 dark:hover:border-amber-700 group relative overflow-hidden flex flex-col h-full">
-                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
-                    <i class="fa-solid fa-pen-ruler text-6xl sm:text-8xl text-amber-500"></i>
+            <div class="bg-amber-50/70 dark:bg-amber-950/40 backdrop-blur-md border border-amber-200/60 dark:border-amber-800/40 rounded-3xl p-6 transition-all duration-300 hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-700 group relative flex flex-col h-full">
+                <div class="w-12 h-12 rounded-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center mb-4 shrink-0 transition-colors group-hover:bg-amber-100/80 dark:group-hover:bg-amber-900/50 border border-white/50 dark:border-slate-800/50">
+                    <i class="fa-solid fa-pen-ruler text-amber-500 text-xl"></i>
                 </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-200 dark:bg-amber-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-amber-400 dark:border-amber-700 transition-colors shrink-0 relative z-10">
-                    <i class="fa-solid fa-pen-ruler text-amber-700 dark:text-amber-400 text-lg sm:text-xl"></i>
-                </div>
-                <h3 class="text-lg sm:text-xl font-bold text-amber-950 dark:text-amber-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Proyectos 1</h3>
-                <p class="text-amber-700/80 dark:text-amber-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Taller de diseño y conceptualización espacial.</p>
-                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-amber-200/60 dark:border-amber-800/60">
-                    <a href="#proyectos_1" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-amber-300/50 dark:border-amber-700/50 hover:border-amber-400 dark:hover:border-amber-600 text-amber-800 dark:text-amber-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Proyectos 1</h3>
+                <p class="text-gray-500 dark:text-slate-400 text-sm mb-6 flex-grow">Taller de diseño y conceptualización espacial.</p>
+                <div class="flex items-center gap-2 mt-auto pt-4 border-t border-amber-200/50 dark:border-amber-800/50">
+                    <a href="#proyectos_1" class="flex-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-amber-500 hover:text-white dark:hover:bg-amber-600 border border-amber-200/60 dark:border-amber-700/50 text-amber-900 dark:text-amber-100 text-xs font-bold py-2.5 px-2 rounded-xl text-center transition-all shadow-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-bolt"></i> Repaso
                     </a>
-                    <a href="https://drive.google.com/drive/folders/1p21DqRIOzJoSIHMZp-z7b6SWfJ_L73vu?usp=sharing" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-amber-300/50 dark:border-amber-700/50 hover:border-amber-400 dark:hover:border-amber-600 text-amber-800 dark:text-amber-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
-                        <i class="fa-brands fa-google-drive text-amber-600 dark:text-amber-400"></i> Material
+                    <a href="https://drive.google.com/drive/folders/1p21DqRIOzJoSIHMZp-z7b6SWfJ_L73vu?usp=sharing" target="_blank" class="flex-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-white dark:hover:bg-slate-800 border border-amber-200/60 dark:border-amber-700/50 text-amber-900 dark:text-amber-100 text-xs font-bold py-2.5 px-2 rounded-xl text-center transition-all shadow-sm flex items-center justify-center gap-2" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-amber-500"></i> Material
                     </a>
                 </div>
             </div>
             
             <!-- Estructuras 1 -->
-            <div class="bg-blue-100 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-blue-400 dark:hover:border-blue-700 group relative overflow-hidden flex flex-col h-full">
-                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
-                    <i class="fa-solid fa-building text-6xl sm:text-8xl text-blue-500"></i>
+            <div class="bg-blue-50/70 dark:bg-blue-950/40 backdrop-blur-md border border-blue-200/60 dark:border-blue-800/40 rounded-3xl p-6 transition-all duration-300 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-700 group relative flex flex-col h-full">
+                <div class="w-12 h-12 rounded-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center mb-4 shrink-0 transition-colors group-hover:bg-blue-100/80 dark:group-hover:bg-blue-900/50 border border-white/50 dark:border-slate-800/50">
+                    <i class="fa-solid fa-building text-blue-500 text-xl"></i>
                 </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-200 dark:bg-blue-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-blue-400 dark:border-blue-700 transition-colors shrink-0 relative z-10">
-                    <i class="fa-solid fa-building text-blue-700 dark:text-blue-400 text-lg sm:text-xl"></i>
-                </div>
-                <h3 class="text-lg sm:text-xl font-bold text-blue-950 dark:text-blue-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Estructuras 1</h3>
-                <p class="text-blue-700/80 dark:text-blue-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Matemáticas y principios físicos aplicados.</p>
-                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-blue-200/60 dark:border-blue-800/60">
-                    <a href="#estructuras_1" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-blue-300/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-600 text-blue-800 dark:text-blue-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Estructuras 1</h3>
+                <p class="text-gray-500 dark:text-slate-400 text-sm mb-6 flex-grow">Matemáticas y principios físicos aplicados.</p>
+                <div class="flex items-center gap-2 mt-auto pt-4 border-t border-blue-200/50 dark:border-blue-800/50">
+                    <a href="#estructuras_1" class="flex-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 border border-blue-200/60 dark:border-blue-700/50 text-blue-900 dark:text-blue-100 text-xs font-bold py-2.5 px-2 rounded-xl text-center transition-all shadow-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-bolt"></i> Repaso
                     </a>
-                    <a href="https://drive.google.com/drive/folders/1xXq35egFjH3ThsywAAVwXS0dfYszjUiX?usp=sharing" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-blue-300/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-600 text-blue-800 dark:text-blue-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
-                        <i class="fa-brands fa-google-drive text-blue-600 dark:text-blue-400"></i> Material
+                    <a href="https://drive.google.com/drive/folders/1xXq35egFjH3ThsywAAVwXS0dfYszjUiX?usp=sharing" target="_blank" class="flex-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-white dark:hover:bg-slate-800 border border-blue-200/60 dark:border-blue-700/50 text-blue-900 dark:text-blue-100 text-xs font-bold py-2.5 px-2 rounded-xl text-center transition-all shadow-sm flex items-center justify-center gap-2" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-blue-500"></i> Material
                     </a>
                 </div>
             </div>
 
             <!-- Comunicación 1 -->
-            <div class="bg-purple-100 dark:bg-purple-950/30 border border-purple-300 dark:border-purple-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-purple-400 dark:hover:border-purple-700 group relative overflow-hidden flex flex-col h-full">
-                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
-                    <i class="fa-solid fa-comments text-6xl sm:text-8xl text-purple-500"></i>
+            <div class="bg-purple-50/70 dark:bg-purple-950/40 backdrop-blur-md border border-purple-200/60 dark:border-purple-800/40 rounded-3xl p-6 transition-all duration-300 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-700 group relative flex flex-col h-full">
+                <div class="w-12 h-12 rounded-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center mb-4 shrink-0 transition-colors group-hover:bg-purple-100/80 dark:group-hover:bg-purple-900/50 border border-white/50 dark:border-slate-800/50">
+                    <i class="fa-solid fa-comments text-purple-500 text-xl"></i>
                 </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-200 dark:bg-purple-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-purple-400 dark:border-purple-700 shrink-0 relative z-10">
-                    <i class="fa-solid fa-comments text-purple-700 dark:text-purple-400 text-lg sm:text-xl"></i>
-                </div>
-                <h3 class="text-lg sm:text-xl font-bold text-purple-950 dark:text-purple-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Comunicación 1</h3>
-                <p class="text-purple-700/80 dark:text-purple-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Expresión oral, escrita y visual.</p>
-                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-purple-200/60 dark:border-purple-800/60">
-                    <button disabled class="flex-1 bg-white/40 dark:bg-black/10 border border-purple-300/30 dark:border-purple-700/30 text-purple-800/50 dark:text-purple-300/50 text-xs font-bold py-2 px-2 rounded-xl text-center cursor-not-allowed flex items-center justify-center gap-1.5">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Comunicación 1</h3>
+                <p class="text-gray-500 dark:text-slate-400 text-sm mb-6 flex-grow">Expresión oral, escrita y visual.</p>
+                <div class="flex items-center gap-2 mt-auto pt-4 border-t border-purple-200/50 dark:border-purple-800/50">
+                    <button disabled class="flex-1 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm border border-white/30 dark:border-purple-800/40 text-purple-800/50 dark:text-purple-300/50 text-xs font-bold py-2.5 px-2 rounded-xl text-center cursor-not-allowed flex items-center justify-center gap-2">
                         <i class="fa-solid fa-lock"></i> Repaso
                     </button>
-                    <a href="https://drive.google.com/drive/folders/1j-tkIUE8CuCd-Tp81Od86fkrudWbcUHw?usp=sharing" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-purple-300/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-600 text-purple-800 dark:text-purple-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
-                        <i class="fa-brands fa-google-drive text-purple-600 dark:text-purple-400"></i> Material
+                    <a href="https://drive.google.com/folders/1j-tkIUE8CuCd-Tp81Od86fkrudWbcUHw?usp=sharing" target="_blank" class="flex-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-white dark:hover:bg-slate-800 border border-purple-200/60 dark:border-purple-700/50 text-purple-900 dark:text-purple-100 text-xs font-bold py-2.5 px-2 rounded-xl text-center transition-all shadow-sm flex items-center justify-center gap-2" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-purple-500"></i> Material
                     </a>
                 </div>
             </div>
 
             <!-- Representación 1 -->
-            <div class="bg-emerald-100 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-700 group relative overflow-hidden flex flex-col h-full">
-                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
-                    <i class="fa-solid fa-vector-square text-6xl sm:text-8xl text-emerald-500"></i>
+            <div class="bg-emerald-50/70 dark:bg-emerald-950/40 backdrop-blur-md border border-emerald-200/60 dark:border-emerald-800/40 rounded-3xl p-6 transition-all duration-300 hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-700 group relative flex flex-col h-full">
+                <div class="w-12 h-12 rounded-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center mb-4 shrink-0 transition-colors group-hover:bg-emerald-100/80 dark:group-hover:bg-emerald-900/50 border border-white/50 dark:border-slate-800/50">
+                    <i class="fa-solid fa-vector-square text-emerald-500 text-xl"></i>
                 </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-200 dark:bg-emerald-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-emerald-400 dark:border-emerald-700 shrink-0 relative z-10">
-                    <i class="fa-solid fa-vector-square text-emerald-700 dark:text-emerald-400 text-lg sm:text-xl"></i>
-                </div>
-                <h3 class="text-lg sm:text-xl font-bold text-emerald-950 dark:text-emerald-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Representación 1</h3>
-                <p class="text-emerald-700/80 dark:text-emerald-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Dibujo arquitectónico, planimetría y modelado.</p>
-                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-emerald-200/60 dark:border-emerald-800/60">
-                    <button disabled class="flex-1 bg-white/40 dark:bg-black/10 border border-emerald-300/30 dark:border-emerald-700/30 text-emerald-800/50 dark:text-emerald-300/50 text-xs font-bold py-2 px-2 rounded-xl text-center cursor-not-allowed flex items-center justify-center gap-1.5">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Representación 1</h3>
+                <p class="text-gray-500 dark:text-slate-400 text-sm mb-6 flex-grow">Dibujo arquitectónico, planimetría y modelado.</p>
+                <div class="flex items-center gap-2 mt-auto pt-4 border-t border-emerald-200/50 dark:border-emerald-800/50">
+                    <button disabled class="flex-1 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm border border-white/30 dark:border-emerald-800/40 text-emerald-800/50 dark:text-emerald-300/50 text-xs font-bold py-2.5 px-2 rounded-xl text-center cursor-not-allowed flex items-center justify-center gap-2">
                         <i class="fa-solid fa-lock"></i> Repaso
                     </button>
-                    <a href="https://drive.google.com/drive/folders/1os3QGHCRY0mREwkNQObnkbgqmYhkIvWV?usp=sharing" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-emerald-300/50 dark:border-emerald-700/50 hover:border-emerald-400 dark:hover:border-emerald-600 text-emerald-800 dark:text-emerald-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
-                        <i class="fa-brands fa-google-drive text-emerald-600 dark:text-emerald-400"></i> Material
+                    <a href="https://drive.google.com/folders/1os3QGHCRY0mREwkNQObnkbgqmYhkIvWV?usp=sharing" target="_blank" class="flex-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-white dark:hover:bg-slate-800 border border-emerald-200/60 dark:border-emerald-700/50 text-emerald-900 dark:text-emerald-100 text-xs font-bold py-2.5 px-2 rounded-xl text-center transition-all shadow-sm flex items-center justify-center gap-2" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-emerald-500"></i> Material
                     </a>
                 </div>
             </div>
 
             <!-- Arquitectura 1 -->
-            <div class="bg-rose-100 dark:bg-rose-950/30 border border-rose-300 dark:border-rose-800/50 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-rose-400 dark:hover:border-rose-700 group relative overflow-hidden flex flex-col h-full">
-                <div class="absolute top-0 right-0 p-4 sm:p-6 opacity-10 dark:opacity-5 group-hover:opacity-20 transition-opacity pointer-events-none group-hover:scale-110 duration-500">
-                    <i class="fa-solid fa-landmark text-6xl sm:text-8xl text-rose-500"></i>
+            <div class="bg-rose-50/70 dark:bg-rose-950/40 backdrop-blur-md border border-rose-200/60 dark:border-rose-800/40 rounded-3xl p-6 transition-all duration-300 hover:shadow-lg hover:border-rose-300 dark:hover:border-rose-700 group relative flex flex-col h-full">
+                <div class="w-12 h-12 rounded-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center mb-4 shrink-0 transition-colors group-hover:bg-rose-100/80 dark:group-hover:bg-rose-900/50 border border-white/50 dark:border-slate-800/50">
+                    <i class="fa-solid fa-landmark text-rose-500 text-xl"></i>
                 </div>
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-200 dark:bg-rose-900/50 flex items-center justify-center mb-3 sm:mb-4 border border-rose-400 dark:border-rose-700 shrink-0 relative z-10">
-                    <i class="fa-solid fa-landmark text-rose-700 dark:text-rose-400 text-lg sm:text-xl"></i>
-                </div>
-                <h3 class="text-lg sm:text-xl font-bold text-rose-950 dark:text-rose-50 mb-1.5 sm:mb-2 transition-colors relative z-10">Arquitectura 1</h3>
-                <p class="text-rose-700/80 dark:text-rose-200/60 text-xs sm:text-sm mb-6 pr-6 relative z-10 flex-grow">Historia, teoría y referentes clásicos.</p>
-                <div class="flex items-center gap-2 mt-auto relative z-10 pt-4 border-t border-rose-200/60 dark:border-rose-800/60">
-                    <a href="#arquitectura_1" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-rose-300/50 dark:border-rose-700/50 hover:border-rose-400 dark:hover:border-rose-600 text-rose-800 dark:text-rose-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Arquitectura 1</h3>
+                <p class="text-gray-500 dark:text-slate-400 text-sm mb-6 flex-grow">Historia, teoría y referentes clásicos.</p>
+                <div class="flex items-center gap-2 mt-auto pt-4 border-t border-rose-200/50 dark:border-rose-800/50">
+                    <a href="#arquitectura_1" class="flex-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-rose-500 hover:text-white dark:hover:bg-rose-600 border border-rose-200/60 dark:border-rose-700/50 text-rose-900 dark:text-rose-100 text-xs font-bold py-2.5 px-2 rounded-xl text-center transition-all shadow-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-bolt"></i> Repaso
                     </a>
-                    <a href="https://drive.google.com/drive/u/1/folders/14bQFECXBFdK7GZMajfrTz4GAwX_OvSV7" target="_blank" class="flex-1 bg-white/60 dark:bg-black/20 hover:bg-white dark:hover:bg-slate-800 border border-rose-300/50 dark:border-rose-700/50 hover:border-rose-400 dark:hover:border-rose-600 text-rose-800 dark:text-rose-300 text-xs font-bold py-2 px-2 rounded-xl text-center transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5" title="Material de clase en Drive">
-                        <i class="fa-brands fa-google-drive text-rose-600 dark:text-rose-400"></i> Material
+                    <a href="https://drive.google.com/u/1/folders/14bQFECXBFdK7GZMajfrTz4GAwX_OvSV7" target="_blank" class="flex-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm hover:bg-white dark:hover:bg-slate-800 border border-rose-200/60 dark:border-rose-700/50 text-rose-900 dark:text-rose-100 text-xs font-bold py-2.5 px-2 rounded-xl text-center transition-all shadow-sm flex items-center justify-center gap-2" title="Material de clase en Drive">
+                        <i class="fa-brands fa-google-drive text-rose-500"></i> Material
                     </a>
                 </div>
             </div>
         </div>
-        <div class="bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 sm:p-6 mt-8 animate-fade-in">
-            <div class="flex items-center justify-between mb-6 border-b border-slate-200 dark:border-slate-700 pb-3">
+        <div class="bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 rounded-2xl p-6 mt-8 animate-fade-in shadow-sm">
+            <div class="flex items-center justify-between mb-6 border-b border-white/50 dark:border-slate-800/50 pb-4">
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <div class="bg-amber-500 text-slate-900 p-1.5 rounded shadow-sm">
-                        <i class="fa-solid fa-list-check text-sm sm:text-base"></i>
-                    </div>
-                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Tareas Próximas</h2>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Tareas Próximas</h2>
                 </div>
-                <a href="#tareas" class="text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm">Ver panel <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                <a href="#tareas" class="text-xs font-bold text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white transition-colors bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border border-white/50 dark:border-slate-700/50 px-3 py-1.5 rounded-lg">Ver panel <i class="fa-solid fa-arrow-right ml-1"></i></a>
             </div>
             <div id="dashboard-tasks" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"></div>
         </div>
         
-        <div class="bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 sm:p-6 mt-8 animate-fade-in">
-            <div class="flex items-center gap-2 sm:gap-3 mb-6 border-b border-slate-200 dark:border-slate-700 pb-3">
-                <div class="bg-emerald-500 text-white p-1.5 rounded shadow-sm">
-                    <i class="fa-solid fa-link text-sm sm:text-base"></i>
-                </div>
-                <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Enlaces Institucionales</h2>
+        <div class="bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 rounded-2xl p-6 mt-8 animate-fade-in shadow-sm">
+            <div class="flex items-center gap-2 sm:gap-3 mb-6 border-b border-white/50 dark:border-slate-800/50 pb-4">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Enlaces Institucionales</h2>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="https://docencia.ulagos.cl/notas" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md transition-all p-4 rounded-xl group">
-                    <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform shrink-0">
-                        <i class="fa-solid fa-graduation-cap"></i>
+                <a href="https://docencia.ulagos.cl/notas" target="_blank" class="flex items-center gap-3 bg-blue-50/60 dark:bg-blue-950/30 backdrop-blur-sm border border-blue-200/50 dark:border-blue-800/30 hover:bg-blue-100/60 hover:border-blue-300 dark:hover:border-blue-700 transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform shadow-sm shrink-0">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Notas</span>
-                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Portal de docencia</span>
+                        <span class="font-bold text-sm text-blue-900 dark:text-blue-100">Notas</span>
+                        <span class="text-[10px] text-blue-600/70 dark:text-blue-400/70 uppercase tracking-wider">Portal de docencia</span>
                     </div>
                 </a>
-                <a href="https://idelfos.ulagos.cl:8443/idelfos/faces/index.jspx" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-md transition-all p-4 rounded-xl group">
-                    <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 group-hover:scale-110 transition-transform shrink-0">
-                        <i class="fa-solid fa-file-contract"></i>
+                <a href="https://idelfos.ulagos.cl:8443/idelfos/faces/index.jspx" target="_blank" class="flex items-center gap-3 bg-slate-100/60 dark:bg-slate-800/30 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 hover:bg-slate-200/60 hover:border-slate-300 dark:hover:border-slate-600 transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center text-slate-500 group-hover:scale-110 transition-transform shadow-sm shrink-0">
+                        <i class="fa-solid fa-file-contract text-lg"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">iDelfos</span>
+                        <span class="font-bold text-sm text-slate-900 dark:text-slate-100">iDelfos</span>
                         <span class="text-[10px] text-slate-500 uppercase tracking-wider">Certificados</span>
                     </div>
                 </a>
-                <a href="https://asistencia.ulagos.cl/" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-rose-400 dark:hover:border-rose-600 hover:shadow-md transition-all p-4 rounded-xl group">
-                    <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform shrink-0">
-                        <i class="fa-solid fa-clipboard-user"></i>
+                <a href="https://asistencia.ulagos.cl/" target="_blank" class="flex items-center gap-3 bg-rose-50/60 dark:bg-rose-950/30 backdrop-blur-sm border border-rose-200/50 dark:border-rose-800/30 hover:bg-rose-100/60 hover:border-rose-300 dark:hover:border-rose-700 transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform shadow-sm shrink-0">
+                        <i class="fa-solid fa-clipboard-user text-lg"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Asistencia</span>
-                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Registro de clases</span>
+                        <span class="font-bold text-sm text-rose-900 dark:text-rose-100">Asistencia</span>
+                        <span class="text-[10px] text-rose-600/70 dark:text-rose-400/70 uppercase tracking-wider">Registro de clases</span>
                     </div>
                 </a>
-                <a href="https://semda.ulagos.cl/solicitudes/" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-md transition-all p-4 rounded-xl group">
-                    <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform shrink-0">
-                        <i class="fa-solid fa-notes-medical"></i>
+                <a href="https://semda.ulagos.cl/solicitudes/" target="_blank" class="flex items-center gap-3 bg-emerald-50/60 dark:bg-emerald-950/30 backdrop-blur-sm border border-emerald-200/50 dark:border-emerald-800/30 hover:bg-emerald-100/60 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform shadow-sm shrink-0">
+                        <i class="fa-solid fa-notes-medical text-lg"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">SEMDA</span>
-                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Licencias Médicas</span>
+                        <span class="font-bold text-sm text-emerald-900 dark:text-emerald-100">SEMDA</span>
+                        <span class="text-[10px] text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-wider">Licencias Médicas</span>
                     </div>
                 </a>
-                <a href="https://research.ebsco.com/c/arw3kp/search" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-600 hover:shadow-md transition-all p-4 rounded-xl group">
-                    <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform shrink-0">
-                        <i class="fa-solid fa-book-open"></i>
+                <a href="https://research.ebsco.com/c/arw3kp/search" target="_blank" class="flex items-center gap-3 bg-purple-50/60 dark:bg-purple-950/30 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/30 hover:bg-purple-100/60 hover:border-purple-300 dark:hover:border-purple-700 transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform shadow-sm shrink-0">
+                        <i class="fa-solid fa-book-open text-lg"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Biblioteca</span>
-                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Búsqueda de material</span>
+                        <span class="font-bold text-sm text-purple-900 dark:text-purple-100">Biblioteca</span>
+                        <span class="text-[10px] text-purple-600/70 dark:text-purple-400/70 uppercase tracking-wider">Búsqueda de material</span>
                     </div>
                 </a>
-                <a href="https://www.ulagosvirtual.cl/" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-md transition-all p-4 rounded-xl group">
-                    <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform shrink-0">
-                        <i class="fa-solid fa-laptop-code"></i>
+                <a href="https://www.ulagosvirtual.cl/" target="_blank" class="flex items-center gap-3 bg-amber-50/60 dark:bg-amber-950/30 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 hover:bg-amber-100/60 hover:border-amber-300 dark:hover:border-amber-700 transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform shadow-sm shrink-0">
+                        <i class="fa-solid fa-laptop-code text-lg"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">ULagos Virtual</span>
-                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Plataforma E-learning</span>
+                        <span class="font-bold text-sm text-amber-900 dark:text-amber-100">ULagos Virtual</span>
+                        <span class="text-[10px] text-amber-600/70 dark:text-amber-400/70 uppercase tracking-wider">Plataforma E-learning</span>
                     </div>
                 </a>
-                <a href="https://pagos.ulagos.cl/" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-md transition-all p-4 rounded-xl group">
-                    <div class="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform shrink-0">
-                        <i class="fa-solid fa-credit-card"></i>
+                <a href="https://pagos.ulagos.cl/" target="_blank" class="flex items-center gap-3 bg-teal-50/60 dark:bg-teal-950/30 backdrop-blur-sm border border-teal-200/50 dark:border-teal-800/30 hover:bg-teal-100/60 hover:border-teal-300 dark:hover:border-teal-700 transition-all p-4 rounded-xl group">
+                    <div class="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center text-teal-500 group-hover:scale-110 transition-transform shadow-sm shrink-0">
+                        <i class="fa-solid fa-credit-card text-lg"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Pagos</span>
-                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">Aranceles y otros</span>
+                        <span class="font-bold text-sm text-teal-900 dark:text-teal-100">Pagos</span>
+                        <span class="text-[10px] text-teal-600/70 dark:text-teal-400/70 uppercase tracking-wider">Aranceles y otros</span>
                     </div>
                 </a>
             </div>
@@ -446,20 +479,17 @@
 
     <template data-route="#glosario">
         <div class="animate-fade-in space-y-6 sm:space-y-8">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-slate-800 pb-6">
                 <div>
-                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
-                        <i class="fa-solid fa-book-bookmark text-amber-500"></i> Glosario de Arquitectura
-                    </h1>
-                    <p class="text-slate-600 dark:text-slate-400 mt-2 text-sm sm:text-base">Conceptos fundamentales de diseño, espacio y composición.</p>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Glosario de Arquitectura</h1>
                 </div>
-                <div class="w-full md:w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm focus-within:ring-2 focus-within:ring-amber-500 transition-shadow">
-                    <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
-                    <input type="text" id="search-input" placeholder="Buscar concepto..." class="w-full bg-transparent border-none outline-none text-slate-800 dark:text-slate-200 text-sm placeholder-slate-400 font-medium">
+                <div class="w-full md:w-72 bg-white/70 dark:bg-slate-950/70 backdrop-blur-md border border-white/50 dark:border-slate-700/50 rounded-xl px-4 py-2.5 flex items-center gap-3 shadow-sm focus-within:border-gray-400 dark:focus-within:border-slate-600 transition-colors">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                    <input type="text" id="search-input" placeholder="Buscar concepto..." class="w-full bg-transparent border-none outline-none text-gray-800 dark:text-slate-200 text-sm placeholder-gray-400 font-medium">
                 </div>
             </div>
             <div id="glosario-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
-            <div id="empty-state-glosario" class="hidden flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500">
+            <div id="empty-state-glosario" class="hidden flex-col items-center justify-center py-16 text-gray-400 dark:text-slate-500">
                 <i class="fa-solid fa-ghost text-5xl mb-4 opacity-50"></i>
                 <p class="text-base font-bold text-center">No se encontraron conceptos con esa palabra.</p>
             </div>
@@ -468,149 +498,157 @@
 
     <template data-route="#horario">
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 items-start animate-fade-in">
-            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
-                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Lunes</h3>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '09:30 - 10:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 p-4 rounded-3xl relative shadow-soft">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent opacity-50"></div>
+                <h3 class="font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest text-xs sm:text-sm mb-2 text-center">Lunes</h3>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '09:30 - 10:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">09:30 - 10:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '10:30 - 11:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '10:30 - 11:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">10:30 - 11:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '11:30 - 12:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '11:30 - 12:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">11:30 - 12:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '12:30 - 13:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '12:30 - 13:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">12:30 - 13:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '13:15 - 14:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm mt-1 cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                <div onclick="openClassModal('Proyectos 1: Espacio', '13:15 - 14:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm mt-1 cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">13:15 - 14:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="mt-1 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase">Profs: F. Martinez, Y. Alvarez</span>
+                <div class="mt-auto pt-3 border-t border-slate-200/50 dark:border-slate-700/50 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-1"><i class="fa-solid fa-chalkboard-user"></i> Profs: F. Martinez, Y. Alvarez</span>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
-                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Martes</h3>
-                <div onclick="openClassModal('Estructuras 1: Matemáticas', '14:15 - 15:00', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-blue-100 border border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/50 p-3 sm:p-4 rounded-xl shadow-sm mt-0 lg:mt-[310px] cursor-pointer hover:bg-blue-200 hover:border-blue-400 dark:hover:bg-blue-900/40 transition-all">
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 p-4 rounded-3xl relative shadow-soft">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent opacity-50"></div>
+                <h3 class="font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest text-xs sm:text-sm mb-2 text-center">Martes</h3>
+                <div onclick="openClassModal('Estructuras 1: Matemáticas', '14:15 - 15:00', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-blue-400 dark:border-blue-500 p-3 sm:p-4 rounded-xl shadow-sm mt-0 lg:mt-[310px] cursor-pointer hover:-translate-y-1 transition-all group hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 mb-1 tracking-widest uppercase">14:15 - 15:00</div>
-                    <div class="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-50 leading-tight">Estructuras 1: Matemáticas</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-blue-700/80 dark:text-blue-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Estructuras 1: Matemáticas</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-blue-500"></i> Sala 2</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Estructuras 1: Matemáticas', '15:15 - 16:00', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-blue-100 border border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-200 hover:border-blue-400 dark:hover:bg-blue-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Estructuras 1: Matemáticas', '15:15 - 16:00', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-blue-400 dark:border-blue-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 mb-1 tracking-widest uppercase">15:15 - 16:00</div>
-                    <div class="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-50 leading-tight">Estructuras 1: Matemáticas</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-blue-700/80 dark:text-blue-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Estructuras 1: Matemáticas</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-blue-500"></i> Sala 2</div>
                 </div>
-                <div class="mt-1 mb-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase">Prof: Mauro F. Robles</span>
+                <div class="mt-auto pt-3 border-t border-slate-200/50 dark:border-slate-700/50 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-1"><i class="fa-solid fa-chalkboard-user"></i> Prof: Mauro F. Robles</span>
                 </div>
-                <div onclick="openClassModal('Comunicación 1', '16:15 - 17:00', 'Sala Taller 3', 'SERGIO TRABUCCO', 'purple')" class="bg-purple-100 border border-purple-300 dark:bg-purple-950/30 dark:border-purple-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-purple-200 hover:border-purple-400 dark:hover:bg-purple-900/40 transition-all">
+                <div onclick="openClassModal('Comunicación 1', '16:15 - 17:00', 'Sala Taller 3', 'SERGIO TRABUCCO', 'purple')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-purple-400 dark:border-purple-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-purple-500 dark:hover:border-purple-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-400 mb-1 tracking-widest uppercase">16:15 - 17:00</div>
-                    <div class="text-xs sm:text-sm font-bold text-purple-950 dark:text-purple-50 leading-tight">Comunicación 1</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-purple-700/80 dark:text-purple-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 3</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Comunicación 1</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-purple-500"></i> Sala Taller 3</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Comunicación 1', '17:15 - 18:00', 'Sala Taller 3', 'SERGIO TRABUCCO', 'purple')" class="bg-purple-100 border border-purple-300 dark:bg-purple-950/30 dark:border-purple-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-purple-200 hover:border-purple-400 dark:hover:bg-purple-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Comunicación 1', '17:15 - 18:00', 'Sala Taller 3', 'SERGIO TRABUCCO', 'purple')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-purple-400 dark:border-purple-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-purple-500 dark:hover:border-purple-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-400 mb-1 tracking-widest uppercase">17:15 - 18:00</div>
-                    <div class="text-xs sm:text-sm font-bold text-purple-950 dark:text-purple-50 leading-tight">Comunicación 1</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-purple-700/80 dark:text-purple-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 3</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Comunicación 1</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-purple-500"></i> Sala Taller 3</div>
                 </div>
-                <div class="mt-1 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase">Prof: Sergio Trabucco</span>
+                <div class="mt-auto pt-3 border-t border-slate-200/50 dark:border-slate-700/50 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-1"><i class="fa-solid fa-chalkboard-user"></i> Prof: Sergio Trabucco</span>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
-                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Miércoles</h3>
-                <div onclick="openClassModal('Representación 1: Composición', '09:30 - 10:15', 'Sala Taller 1', 'ALBERTO ALEJANDRO MANCILLA CARRILLO', 'emerald')" class="bg-emerald-100 border border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-emerald-200 hover:border-emerald-400 dark:hover:bg-emerald-900/40 transition-all">
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 p-4 rounded-3xl relative shadow-soft">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent opacity-50"></div>
+                <h3 class="font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest text-xs sm:text-sm mb-2 text-center">Miércoles</h3>
+                <div onclick="openClassModal('Representación 1: Composición', '09:30 - 10:15', 'Sala Taller 1', 'ALBERTO ALEJANDRO MANCILLA CARRILLO', 'emerald')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-emerald-400 dark:border-emerald-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-emerald-500 dark:hover:border-emerald-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mb-1 tracking-widest uppercase">09:30 - 10:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-50 leading-tight">Representación 1: Composición</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-emerald-700/80 dark:text-emerald-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Representación 1: Composición</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-emerald-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Representación 1: Composición', '10:30 - 11:15', 'Sala Taller 1', 'ALBERTO ALEJANDRO MANCILLA CARRILLO', 'emerald')" class="bg-emerald-100 border border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-emerald-200 hover:border-emerald-400 dark:hover:bg-emerald-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Representación 1: Composición', '10:30 - 11:15', 'Sala Taller 1', 'ALBERTO ALEJANDRO MANCILLA CARRILLO', 'emerald')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-emerald-400 dark:border-emerald-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-emerald-500 dark:hover:border-emerald-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mb-1 tracking-widest uppercase">10:30 - 11:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-50 leading-tight">Representación 1: Composición</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-emerald-700/80 dark:text-emerald-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Representación 1: Composición</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-emerald-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="mt-1 mb-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase">Prof: Alberto A. Mancilla</span>
+                <div class="mt-auto pt-3 border-t border-slate-200/50 dark:border-slate-700/50 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-1"><i class="fa-solid fa-chalkboard-user"></i> Prof: Alberto A. Mancilla</span>
                 </div>
-                <div onclick="openClassModal('Estructuras 1: Matemáticas', '11:30 - 12:15', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-blue-100 border border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-200 hover:border-blue-400 dark:hover:bg-blue-900/40 transition-all">
+                <div onclick="openClassModal('Estructuras 1: Matemáticas', '11:30 - 12:15', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-blue-400 dark:border-blue-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 mb-1 tracking-widest uppercase">11:30 - 12:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-50 leading-tight">Estructuras 1: Matemáticas</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-blue-700/80 dark:text-blue-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Estructuras 1: Matemáticas</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-blue-500"></i> Sala 2</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Estructuras 1: Matemáticas', '12:30 - 13:15', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-blue-100 border border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-200 hover:border-blue-400 dark:hover:bg-blue-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Estructuras 1: Matemáticas', '12:30 - 13:15', 'Sala 2', 'MAURO FABIÁN ROBLES PÉREZ', 'blue')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-blue-400 dark:border-blue-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 mb-1 tracking-widest uppercase">12:30 - 13:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-50 leading-tight">Estructuras 1: Matemáticas</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-blue-700/80 dark:text-blue-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Estructuras 1: Matemáticas</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-blue-500"></i> Sala 2</div>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
-                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Jueves</h3>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '09:30 - 10:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 p-4 rounded-3xl relative shadow-soft">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent opacity-50"></div>
+                <h3 class="font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest text-xs sm:text-sm mb-2 text-center">Jueves</h3>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '09:30 - 10:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">09:30 - 10:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '10:30 - 11:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '10:30 - 11:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">10:30 - 11:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '11:30 - 12:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '11:30 - 12:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">11:30 - 12:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '12:30 - 13:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Proyectos 1: Espacio', '12:30 - 13:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">12:30 - 13:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
                 </div>
-                <div onclick="openClassModal('Proyectos 1: Espacio', '13:15 - 14:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-amber-100 border border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/50 p-3 sm:p-4 rounded-xl shadow-sm mt-1 cursor-pointer hover:bg-amber-200 hover:border-amber-400 dark:hover:bg-amber-900/40 transition-all">
+                <div onclick="openClassModal('Proyectos 1: Espacio', '13:15 - 14:15', 'Sala Taller 1', 'FRANCISCO ALEJANDRO MARTINEZ HURTADO, YASMINE ARLENE ALVAREZ OJEDA', 'amber')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-amber-400 dark:border-amber-500 p-3 sm:p-4 rounded-xl shadow-sm mt-1 cursor-pointer hover:-translate-y-1 transition-all group hover:border-amber-500 dark:hover:border-amber-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 mb-1 tracking-widest uppercase">13:15 - 14:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-amber-950 dark:text-amber-50 leading-tight">Proyectos 1: Espacio</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-amber-700/80 dark:text-amber-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala Taller 1</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Proyectos 1: Espacio</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> Sala Taller 1</div>
+                </div>
+                <div class="mt-auto pt-3 border-t border-slate-200/50 dark:border-slate-700/50 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-1"><i class="fa-solid fa-chalkboard-user"></i> Profs: F. Martinez, Y. Alvarez</span>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2 sm:gap-3 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl">
-                <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-widest text-xs sm:text-sm mb-1 border-b-2 border-slate-200 dark:border-slate-700 pb-2 text-center">Viernes</h3>
-                <div onclick="openClassModal('Arquitectura 1: Clásica', '11:30 - 12:15', 'Sala 2', 'DENISE ANNE ENGLER TAYLOR', 'rose')" class="bg-rose-100 border border-rose-300 dark:bg-rose-950/30 dark:border-rose-800/50 p-3 sm:p-4 rounded-xl shadow-sm mt-0 lg:mt-[155px] cursor-pointer hover:bg-rose-200 hover:border-rose-400 dark:hover:bg-rose-900/40 transition-all">
+            <div class="flex flex-col gap-2 sm:gap-3 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 p-4 rounded-3xl relative shadow-soft">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent opacity-50"></div>
+                <h3 class="font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest text-xs sm:text-sm mb-2 text-center">Viernes</h3>
+                <div onclick="openClassModal('Arquitectura 1: Clásica', '11:30 - 12:15', 'Sala 2', 'DENISE ANNE ENGLER TAYLOR', 'rose')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-rose-400 dark:border-rose-500 p-3 sm:p-4 rounded-xl shadow-sm mt-0 lg:mt-[155px] cursor-pointer hover:-translate-y-1 transition-all group hover:border-rose-500 dark:hover:border-rose-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-rose-700 dark:text-rose-400 mb-1 tracking-widest uppercase">11:30 - 12:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-rose-950 dark:text-rose-50 leading-tight">Arquitectura 1: Clásica</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-rose-700/80 dark:text-rose-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Arquitectura 1: Clásica</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-rose-500"></i> Sala 2</div>
                 </div>
-                <div class="py-0.5 flex justify-center"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Descanso</span></div>
-                <div onclick="openClassModal('Arquitectura 1: Clásica', '12:30 - 13:15', 'Sala 2', 'DENISE ANNE ENGLER TAYLOR', 'rose')" class="bg-rose-100 border border-rose-300 dark:bg-rose-950/30 dark:border-rose-800/50 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:bg-rose-200 hover:border-rose-400 dark:hover:bg-rose-900/40 transition-all">
+                <div class="flex items-center justify-center py-2 my-1"><span class="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">Descanso</span></div>
+                <div onclick="openClassModal('Arquitectura 1: Clásica', '12:30 - 13:15', 'Sala 2', 'DENISE ANNE ENGLER TAYLOR', 'rose')" class="bg-white/60 dark:bg-slate-900/60 border-l-4 border-rose-400 dark:border-rose-500 p-3 sm:p-4 rounded-xl shadow-sm cursor-pointer hover:-translate-y-1 transition-all group hover:border-rose-500 dark:hover:border-rose-400 hover:shadow-md">
                     <div class="text-[10px] sm:text-[11px] font-bold text-rose-700 dark:text-rose-400 mb-1 tracking-widest uppercase">12:30 - 13:15</div>
-                    <div class="text-xs sm:text-sm font-bold text-rose-950 dark:text-rose-50 leading-tight">Arquitectura 1: Clásica</div>
-                    <div class="text-[10px] sm:text-xs font-medium text-rose-700/80 dark:text-rose-300/80 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Sala 2</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">Arquitectura 1: Clásica</div>
+                    <div class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 flex items-center gap-1"><i class="fa-solid fa-location-dot text-rose-500"></i> Sala 2</div>
                 </div>
-                <div class="mt-1 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase">Prof: Denise A. Engler</span>
+                <div class="mt-auto pt-3 border-t border-slate-200/50 dark:border-slate-700/50 text-center">
+                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-1"><i class="fa-solid fa-chalkboard-user"></i> Prof: Denise A. Engler</span>
                 </div>
             </div>
         </div>
@@ -620,27 +658,24 @@
         <div class="animate-fade-in space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <div class="bg-amber-500 text-slate-900 p-1.5 rounded shadow-sm">
-                        <i class="fa-solid fa-list-check text-base sm:text-lg"></i>
-                    </div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Panel de Entregas</h2>
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Panel de Entregas</h2>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full xl:w-auto">
-                    <button id="btn-export-tasks" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 text-xs sm:text-sm rounded-lg px-3 py-2 font-bold shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <button id="btn-export-tasks" class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/50 dark:border-slate-700/50 text-gray-700 dark:text-slate-300 hover:bg-white/90 dark:hover:bg-slate-800 text-xs rounded-xl px-4 py-2.5 font-medium shadow-sm transition-colors flex items-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-file-export"></i> <span class="hidden md:inline">Exportar</span>
                     </button>
-                    <label for="file-import-tasks" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 text-xs sm:text-sm rounded-lg px-3 py-2 font-bold shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer mb-0">
+                    <label for="file-import-tasks" class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/50 dark:border-slate-700/50 text-gray-700 dark:text-slate-300 hover:bg-white/90 dark:hover:bg-slate-800 text-xs rounded-xl px-4 py-2.5 font-medium shadow-sm transition-colors flex items-center gap-2 cursor-pointer mb-0">
                         <i class="fa-solid fa-file-import"></i> <span class="hidden md:inline">Importar</span>
                     </label>
                     <input type="file" id="file-import-tasks" accept=".txt" class="hidden">
                     
-                    <select id="filter-status" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-lg px-3 py-2 outline-none font-bold shadow-sm cursor-pointer ml-auto xl:ml-0">
+                    <select id="filter-status" class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/50 dark:border-slate-700/50 text-gray-700 dark:text-slate-300 text-xs rounded-xl px-4 py-2.5 outline-none font-medium shadow-sm cursor-pointer ml-auto xl:ml-0">
                         <option value="all">Todos los estados</option>
                         <option value="pending">Pendiente</option>
                         <option value="progress">En Progreso</option>
                         <option value="completed">Lista</option>
                     </select>
-                    <select id="filter-subject" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-lg px-3 py-2 outline-none font-bold shadow-sm cursor-pointer">
+                    <select id="filter-subject" class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/50 dark:border-slate-700/50 text-gray-700 dark:text-slate-300 text-xs rounded-xl px-4 py-2.5 outline-none font-medium shadow-sm cursor-pointer">
                         <option value="all">Todas las materias</option>
                         <option value="Proyectos 1">Proyectos 1</option>
                         <option value="Estructuras 1">Estructuras 1</option>
@@ -649,35 +684,35 @@
                         <option value="Arquitectura 1">Arquitectura 1</option>
                         <option value="General">General</option>
                     </select>
-                    <button id="btn-new-task" class="bg-amber-500 hover:bg-amber-600 border border-amber-600 text-slate-900 font-bold text-xs sm:text-sm px-4 py-2 rounded-lg shadow-sm transition-colors flex items-center gap-2 w-full sm:w-auto justify-center">
+                    <button id="btn-new-task" class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-medium text-xs px-5 py-2.5 rounded-xl shadow-sm transition-colors flex items-center gap-2 w-full sm:w-auto justify-center">
                         <i class="fa-solid fa-plus"></i> Nueva
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 sm:p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-slate-700 pb-3">
-                    <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-regular fa-calendar-days text-amber-500"></i> <span id="calendar-month-year" class="capitalize">Mes Año</span>
+            <div class="bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-6 border-b border-white/50 dark:border-slate-800/50 pb-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span id="calendar-month-year" class="capitalize">Mes Año</span>
                     </h3>
                     <div class="flex gap-2">
-                        <button id="btn-prev-month" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center border border-slate-200 dark:border-slate-700"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                        <button id="btn-next-month" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center border border-slate-200 dark:border-slate-700"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        <button id="btn-prev-month" class="w-8 h-8 rounded-lg bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm text-gray-600 dark:text-slate-400 hover:bg-white/80 dark:hover:bg-slate-800 transition-colors flex items-center justify-center border border-white/50 dark:border-slate-700/50"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                        <button id="btn-next-month" class="w-8 h-8 rounded-lg bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm text-gray-600 dark:text-slate-400 hover:bg-white/80 dark:hover:bg-slate-800 transition-colors flex items-center justify-center border border-white/50 dark:border-slate-700/50"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                     </div>
                 </div>
-                <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[9px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
                     <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
                 </div>
                 <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2 auto-rows-fr"></div>
             </div>
 
-            <div id="active-date-indicator" class="hidden flex justify-between items-center bg-amber-100 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-800/50 p-3 rounded-xl text-amber-800 dark:text-amber-400 text-sm font-bold shadow-sm">
-                <span><i class="fa-solid fa-filter mr-2"></i> Filtrando por fecha: <span id="active-date-text"></span></span>
-                <button onclick="filterByDate(null)" class="hover:text-amber-600 dark:hover:text-amber-200 px-2 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            <div id="active-date-indicator" class="hidden flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border border-white/50 dark:border-slate-700/50 p-4 rounded-xl text-gray-700 dark:text-slate-300 text-sm font-medium shadow-sm">
+                <span>Filtro activo: <span id="active-date-text" class="font-bold text-gray-900 dark:text-white"></span></span>
+                <button onclick="filterByDate(null)" class="hover:text-gray-900 dark:hover:text-white px-2 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div id="view-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 items-start mt-4"></div>
-            <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/50 rounded-2xl">
+            <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-gray-400 dark:text-slate-500 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 rounded-2xl">
                 <i class="fa-solid fa-clipboard-check text-5xl mb-4 opacity-50"></i>
                 <p class="text-base font-bold text-center px-4">No se encontraron tareas con estos filtros.</p>
             </div>
@@ -686,11 +721,8 @@
 
     <template data-route="#proyectos_1">
         <div class="animate-fade-in space-y-4">
-            <div class="flex items-center gap-2 sm:gap-3 mb-6">
-                <div class="bg-amber-500 text-slate-900 p-1.5 rounded shadow-sm">
-                    <i class="fa-solid fa-folder-open text-base sm:text-lg"></i>
-                </div>
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Directorio de Unidades</h2>
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Directorio Proyectos 1</h2>
             </div>
             <div id="contenedor-unidades" class="space-y-3 sm:space-y-4"></div>
         </div>
@@ -698,24 +730,21 @@
 
     <template data-route="#estructuras_1">
         <div class="animate-fade-in space-y-4">
-            <div class="flex items-center gap-2 sm:gap-3 mb-6">
-                <div class="bg-blue-500 text-white p-1.5 rounded shadow-sm">
-                    <i class="fa-solid fa-folder-open text-base sm:text-lg"></i>
-                </div>
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Directorio Estructuras 1</h2>
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Directorio Estructuras 1</h2>
             </div>
             <div class="space-y-3 sm:space-y-4">
-                <a href="#conjuntos" class="bg-blue-100 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-800/50 rounded-xl p-4 sm:p-6 flex items-center justify-between group block transition-all max-w-4xl hover:shadow-md hover:-translate-y-1 hover:border-blue-400 dark:hover:border-blue-700">
+                <a href="#conjuntos" class="bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 rounded-2xl p-6 flex items-center justify-between group block transition-all max-w-4xl hover:shadow-sm hover:border-white/80 dark:hover:border-slate-700">
                     <div class="flex items-center gap-3 sm:gap-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-200 dark:bg-blue-900/50 flex items-center justify-center border border-blue-400 dark:border-blue-700 shrink-0">
-                            <i class="fa-solid fa-cubes text-blue-700 dark:text-blue-400 text-lg"></i>
+                        <div class="w-12 h-12 rounded-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center border border-white/50 dark:border-slate-700/50 shrink-0">
+                            <i class="fa-solid fa-cubes text-gray-400 text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-blue-950 dark:text-blue-50 mb-1">Teoría de Conjuntos</h3>
-                            <p class="text-blue-700/80 dark:text-blue-200/60 text-xs sm:text-sm">Conceptos básicos, operaciones matemáticas y evaluación de pertenencia.</p>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Teoría de Conjuntos</h3>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm">Conceptos básicos, operaciones matemáticas y evaluación de pertenencia.</p>
                         </div>
                     </div>
-                    <i class="fa-solid fa-arrow-right text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-all ml-2"></i>
+                    <i class="fa-solid fa-arrow-right text-gray-300 group-hover:text-gray-600 dark:group-hover:text-white transition-all ml-2"></i>
                 </a>
             </div>
         </div>
@@ -772,8 +801,8 @@
                 <p class="text-slate-600 dark:text-slate-400 max-w-3xl">La configuración arquitectónica obedece a la geografía y los ciclos del río Nilo. Se concibe como un medio para conferir sentido a la existencia, ofreciendo consuelo frente a la muerte mediante la representación de la vida eterna.</p>
                 
                 <div class="grid lg:grid-cols-2 gap-6">
-                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-amber-400 dark:hover:border-amber-600 transition-colors">
-                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
+                    <div class="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-amber-400 dark:hover:border-amber-600 transition-colors">
+                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-white/50 dark:border-slate-700/50">
                             <svg viewBox="0 0 100 100" class="w-full h-auto max-w-[120px]">
                                 <line x1="50" y1="0" x2="10" y2="90" stroke="#f59e0b" stroke-width="2" class="svg-ray opacity-0 group-hover:opacity-100" />
                                 <line x1="50" y1="0" x2="30" y2="90" stroke="#f59e0b" stroke-width="2" class="svg-ray opacity-0 group-hover:opacity-100" />
@@ -794,8 +823,8 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-amber-400 dark:hover:border-amber-600 transition-colors">
-                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
+                    <div class="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-amber-400 dark:hover:border-amber-600 transition-colors">
+                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-white/50 dark:border-slate-700/50">
                             <div class="w-full h-24 border-2 border-slate-300 dark:border-slate-600 relative overflow-hidden flex flex-col justify-between p-2">
                                 <div class="h-2 w-full bg-slate-300 dark:bg-slate-600"></div>
                                 <div class="flex justify-between w-full h-14">
@@ -839,8 +868,8 @@
                         </div>
                     </div>
 
-                    <div class="lg:col-span-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm flex flex-col group cursor-pointer hover:border-blue-400 dark:hover:border-blue-600 transition-colors">
-                        <div class="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-5 flex justify-between items-center">
+                    <div class="lg:col-span-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 rounded-2xl overflow-hidden shadow-sm flex flex-col group cursor-pointer hover:border-blue-400 dark:hover:border-blue-600 transition-colors">
+                        <div class="bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border-b border-white/30 dark:border-slate-700/50 p-5 flex justify-between items-center">
                             <div>
                                 <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">La Desaparición de la Claridad</h3>
                                 <p class="text-xs text-slate-500">Partenón (Ictino, Calícrates, Fidias)</p>
@@ -851,11 +880,11 @@
                             <div class="w-full sm:w-3/5 space-y-3">
                                 <p class="text-sm text-slate-700 dark:text-slate-300">Punto álgido de la arquitectura clásica griega. Diseñado para su lectura exterior mediante la implementación de correcciones ópticas para mitigar deformaciones visuales.</p>
                                 <div class="space-y-2 mt-4">
-                                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
+                                    <div class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-3 rounded-lg border border-white/40 dark:border-slate-800/50">
                                         <span class="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Ausencia de Líneas Rectas</span>
                                         <span class="text-xs text-slate-600 dark:text-slate-400">Curvaturas horizontales en el crepidoma y entablamento.</span>
                                     </div>
-                                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
+                                    <div class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-3 rounded-lg border border-white/40 dark:border-slate-800/50">
                                         <span class="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Inclinación Perimetral</span>
                                         <span class="text-xs text-slate-600 dark:text-slate-400">Muros y columnas levemente inclinados hacia el interior.</span>
                                     </div>
@@ -879,8 +908,8 @@
                 <p class="text-slate-600 dark:text-slate-400 max-w-3xl">La arquitectura se instrumentaliza como símbolo de dominio. Asimila la herencia griega y los desarrollos ingenieriles etruscos, priorizando la monumentalidad espacial interna y la infraestructura cívica.</p>
                 
                 <div class="grid lg:grid-cols-2 gap-6">
-                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-rose-400 dark:hover:border-rose-600 transition-colors">
-                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-100 dark:border-slate-800 h-32">
+                    <div class="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-2xl shadow-sm group flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-rose-400 dark:hover:border-rose-600 transition-colors">
+                        <div class="w-full sm:w-1/3 flex justify-center items-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-white/50 dark:border-slate-700/50 h-32">
                             <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
                                 <rect x="10" y="30" width="15" height="30" class="fill-slate-300 dark:fill-slate-600" />
                                 <rect x="75" y="30" width="15" height="30" class="fill-slate-300 dark:fill-slate-600" />
@@ -898,7 +927,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl shadow-sm space-y-4">
+                    <div class="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-6 rounded-2xl shadow-sm space-y-4">
                         <h3 class="text-lg font-bold text-rose-700 dark:text-rose-500 flex items-center gap-2"><i class="fa-solid fa-city"></i> Urbanismo y Apariencia</h3>
                         <div class="space-y-3">
                             <div class="border-l-2 border-rose-500 pl-3">
@@ -943,7 +972,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-full lg:w-1/2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-lg relative overflow-hidden flex justify-center items-center h-64">
+                <div class="w-full lg:w-1/2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 rounded-2xl p-6 shadow-lg relative overflow-hidden flex justify-center items-center h-64">
                     <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-700/[0.2] bg-[size:20px_20px]"></div>
                     <svg width="240" height="160" viewBox="0 0 240 160" class="relative z-10">
                         <circle cx="90" cy="80" r="60" fill="#3b82f6" fill-opacity="0.4" stroke="#2563eb" stroke-width="2" class="venn-circle" id="venn-A"/>
@@ -958,22 +987,22 @@
             <section class="space-y-6">
                 <h2 class="text-2xl font-bold text-slate-900 dark:text-white border-b-2 border-blue-500 inline-block pb-1">Diccionario Básico</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="interactive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl transition-all">
+                    <div class="interactive-card bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/50 p-5 rounded-xl transition-all">
                         <div class="text-2xl font-black text-blue-500 mb-2">{ }</div>
                         <h3 class="font-bold text-lg mb-1">Conjunto</h3>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Delimitador para agrupar elementos.</p>
                     </div>
-                    <div class="interactive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl transition-all">
+                    <div class="interactive-card bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/50 p-5 rounded-xl transition-all">
                         <div class="text-2xl font-black text-blue-500 mb-2">/</div>
                         <h3 class="font-bold text-lg mb-1">Tal que</h3>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Establece una condición que deben cumplir los elementos.</p>
                     </div>
-                    <div class="interactive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl transition-all">
+                    <div class="interactive-card bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/50 p-5 rounded-xl transition-all">
                         <div class="text-2xl font-black text-emerald-500 mb-2">$\in$</div>
                         <h3 class="font-bold text-lg mb-1">Pertenece</h3>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Indica que un elemento es parte del conjunto.</p>
                     </div>
-                    <div class="interactive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl transition-all">
+                    <div class="interactive-card bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/50 p-5 rounded-xl transition-all">
                         <div class="text-2xl font-black text-red-500 mb-2">$\notin$</div>
                         <h3 class="font-bold text-lg mb-1">No Pertenece</h3>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Indica que un elemento NO es parte del conjunto.</p>
@@ -987,23 +1016,23 @@
                         <i class="fa-solid fa-shapes"></i> Tipos y Operaciones
                     </h3>
                     <ul class="space-y-3">
-                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <li class="flex items-center gap-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-3 rounded-lg border border-white/40 dark:border-slate-700/50">
                             <span class="w-8 h-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-bold rounded">$U$</span>
                             <div><strong class="text-slate-800 dark:text-slate-200">Universo:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">El conjunto que contiene todos los elementos en un contexto dado.</span></div>
                         </li>
-                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <li class="flex items-center gap-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-3 rounded-lg border border-white/40 dark:border-slate-700/50">
                             <span class="w-8 h-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-bold rounded">$\emptyset$</span>
                             <div><strong class="text-slate-800 dark:text-slate-200">Conjunto Vacío:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">No contiene ningún elemento.</span></div>
                         </li>
-                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <li class="flex items-center gap-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-3 rounded-lg border border-white/40 dark:border-slate-700/50">
                             <span class="w-8 h-8 flex items-center justify-center bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 font-bold rounded">$\cup$</span>
                             <div><strong class="text-slate-800 dark:text-slate-200">Unión:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Agrupa todos los elementos de ambos conjuntos.</span></div>
                         </li>
-                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <li class="flex items-center gap-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-3 rounded-lg border border-white/40 dark:border-slate-700/50">
                             <span class="w-8 h-8 flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 font-bold rounded">$\cap$</span>
                             <div><strong class="text-slate-800 dark:text-slate-200">Intersección:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Elementos que existen en ambos conjuntos a la vez.</span></div>
                         </li>
-                        <li class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <li class="flex items-center gap-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-3 rounded-lg border border-white/40 dark:border-slate-700/50">
                             <span class="w-8 h-8 flex items-center justify-center bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 font-bold rounded">$A'$</span>
                             <div><strong class="text-slate-800 dark:text-slate-200">Complemento:</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Todo lo que está en el Universo pero NO en A.</span></div>
                         </li>
@@ -1041,7 +1070,7 @@
                 <p class="text-slate-600 dark:text-slate-400 mb-6">Pasa el cursor sobre cada conjunto para ver cómo se relacionan y ejemplos de los números que contienen.</p>
                 
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    <div class="group relative cursor-pointer interactive-card bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                    <div class="group relative cursor-pointer interactive-card bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-2 border-white/40 dark:border-slate-700/50 hover:border-emerald-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
                         <div class="text-3xl font-black text-slate-300 group-hover:text-emerald-500 transition-colors mb-1">N</div>
                         <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Naturales</div>
                         <div class="absolute inset-0 bg-emerald-500 text-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
@@ -1050,7 +1079,7 @@
                         </div>
                     </div>
 
-                    <div class="group relative cursor-pointer interactive-card bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                    <div class="group relative cursor-pointer interactive-card bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-2 border-white/40 dark:border-slate-700/50 hover:border-blue-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
                         <div class="text-3xl font-black text-slate-300 group-hover:text-blue-500 transition-colors mb-1">Z</div>
                         <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Enteros</div>
                         <div class="absolute inset-0 bg-blue-500 text-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
@@ -1059,7 +1088,7 @@
                         </div>
                     </div>
 
-                    <div class="group relative cursor-pointer interactive-card bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-purple-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                    <div class="group relative cursor-pointer interactive-card bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-2 border-white/40 dark:border-slate-700/50 hover:border-purple-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
                         <div class="text-3xl font-black text-slate-300 group-hover:text-purple-500 transition-colors mb-1">Q</div>
                         <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Racionales</div>
                         <div class="absolute inset-0 bg-purple-500 text-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
@@ -1068,7 +1097,7 @@
                         </div>
                     </div>
 
-                    <div class="group relative cursor-pointer interactive-card bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-rose-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                    <div class="group relative cursor-pointer interactive-card bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-2 border-white/40 dark:border-slate-700/50 hover:border-rose-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
                         <div class="text-3xl font-black text-slate-300 group-hover:text-rose-500 transition-colors mb-1">I</div>
                         <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Irracionales</div>
                         <div class="absolute inset-0 bg-rose-500 text-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
@@ -1077,7 +1106,7 @@
                         </div>
                     </div>
 
-                    <div class="group relative cursor-pointer interactive-card bg-slate-800 dark:bg-slate-200 border-2 border-slate-800 dark:border-slate-200 hover:border-amber-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
+                    <div class="group relative cursor-pointer interactive-card bg-slate-800/60 dark:bg-slate-200/60 backdrop-blur-xl border-2 border-slate-800/50 dark:border-slate-200/50 hover:border-amber-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-32">
                         <div class="text-3xl font-black text-white dark:text-slate-900 group-hover:text-amber-500 transition-colors mb-1">R</div>
                         <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Reales</div>
                         <div class="absolute inset-0 bg-amber-500 text-slate-900 rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center z-10">
@@ -1088,8 +1117,8 @@
                 </div>
             </section>
 
-            <section class="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
-                <div class="bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <section class="bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 rounded-2xl overflow-hidden shadow-sm">
+                <div class="bg-white/40 dark:bg-slate-800/80 backdrop-blur-md border-b border-white/30 dark:border-slate-700/50 p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
                         <i class="fa-solid fa-language text-blue-500"></i> Dos formas de hablar
                     </h2>
@@ -1196,7 +1225,7 @@
                 </div>
             </div>
 
-            <section class="bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 rounded-2xl shadow-sm">
+            <section class="bg-white/60 dark:bg-slate-800/40 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 p-5 sm:p-6 rounded-2xl shadow-sm">
                 <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                     <div class="bg-amber-500 text-slate-900 p-1.5 rounded shadow-sm"><i class="fa-solid fa-bars-staggered text-sm sm:text-base"></i></div>
                     <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Ejercicio: Ritmo</h2>
@@ -1226,7 +1255,7 @@
                 </div>
             </section>
 
-            <section class="bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 rounded-2xl shadow-sm">
+            <section class="bg-white/60 dark:bg-slate-800/40 backdrop-blur-xl border border-white/40 dark:border-slate-800/50 p-5 sm:p-6 rounded-2xl shadow-sm">
                 <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                     <div class="bg-blue-500 text-slate-900 p-1.5 rounded shadow-sm"><i class="fa-solid fa-wind text-sm sm:text-base"></i></div>
                     <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Ejercicio: Movimiento</h2>

@@ -7,11 +7,15 @@
 
 :root {
     /* Sistema de Colores */
-    --color-primary: #f59e0b;      /* amber-500 */
-    --color-accent: #f43f5e;       /* rose-500 */
-    --color-track-light: #cbd5e1;
+    --color-primary: #f5cb0b;      /* A bright yellow for primary actions */
+    --color-accent: #e83f6f;       /* A bright pink for accents */
+    --color-text: #e2e8f0;         /* Light gray for text */
+    --color-bg: #1a1a1a;           /* Dark background */
+    --color-bg-secondary: #2d2d2d; /* Slightly lighter dark for surfaces */
+    --color-border: #475569;       /* Gray for borders and dividers */
+    --color-track-light: #475569;
     --color-track-dark: #334155;
-    --color-grid-light: rgba(0, 0, 0, 0.05);
+    --color-grid-light: rgba(255, 255, 255, 0.05);
     --color-grid-dark: rgba(255, 255, 255, 0.03);
 
     /* Sistema Tipográfico */
@@ -27,6 +31,8 @@
    ========================================= */
 body {
     font-family: var(--font-base);
+    background-color: var(--color-bg);
+    color: var(--color-text);
 }
 
 /* Contenedor Principal Responsive */
@@ -64,10 +70,13 @@ body {
 /* Tarjetas Interactivas */
 .card-interactive {
     transition: all 0.3s ease;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
 }
 .card-interactive:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-primary);
 }
 
 /* Animaciones SVG */
@@ -132,4 +141,5 @@ body {
     width: var(--item-width, 1.5rem);
     border-radius: 2px 2px 0 0; 
     transition: all 0.3s ease;
+    background-color: var(--color-text);
 }

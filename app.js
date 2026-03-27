@@ -207,7 +207,6 @@ function router() {
     if (template) {
         appRoot.innerHTML = template.innerHTML;
         
-        updateBreadcrumb(hash);
         updateNavState(hash);
         
         if(hash === '#home') {
@@ -242,40 +241,108 @@ function router() {
     }
 }
 
-function updateBreadcrumb(hash) {
-    const b = document.getElementById('breadcrumb');
-    const baseAmber = `<a href="#home" class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Portal</a>`;
-    const baseBlue = `<a href="#home" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Portal</a>`;
-    const baseRose = `<a href="#home" class="hover:text-rose-600 dark:hover:text-rose-400 transition-colors">Portal</a>`;
-    
-    if(hash === '#home') b.innerHTML = `<span class="text-slate-900 dark:text-slate-200 font-semibold">Portal</span>`;
-    else if(hash === '#tareas') b.innerHTML = `${baseAmber} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Calendario</span>`;
-    else if(hash === '#horario') b.innerHTML = `${baseAmber} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Horario</span>`;
-    else if(hash === '#glosario') b.innerHTML = `${baseAmber} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Glosario</span>`;
-    else if(hash === '#proyectos_1') b.innerHTML = `${baseAmber} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Proyectos 1</span>`;
-    else if(hash === '#estructuras_1') b.innerHTML = `${baseBlue} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Estructuras 1</span>`;
-    else if(hash === '#arquitectura_1') b.innerHTML = `${baseRose} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Arquitectura 1</span>`;
-    else if(hash === '#origenes_y_evolucion') b.innerHTML = `${baseRose} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <a href="#arquitectura_1" class="hover:text-rose-600 dark:hover:text-rose-400 transition-colors">Arquitectura 1</a> <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Orígenes y Evolución</span>`;
-    else if(hash === '#conjuntos') b.innerHTML = `${baseBlue} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <a href="#estructuras_1" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Estructuras 1</a> <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Teoría de Conjuntos</span>`;
-    else if(hash === '#ritmo_y_movimiento') b.innerHTML = `${baseAmber} <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <a href="#proyectos_1" class="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Proyectos 1</a> <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i> <span class="text-slate-900 dark:text-slate-200 font-semibold">Ritmo y Movimiento</span>`;
-}
-
 function updateNavState(hash) {
-    const navT = document.getElementById('nav-tareas');
-    const navH = document.getElementById('nav-horario');
-    const navG = document.getElementById('nav-glosario');
-    if(hash === '#tareas') navT.classList.add('border-amber-500', 'text-amber-600', 'dark:text-amber-400');
-    else navT.classList.remove('border-amber-500', 'text-amber-600', 'dark:text-amber-400');
+    document.querySelectorAll('.sidebar-link, .sidebar-sublink').forEach(link => {
+        link.classList.remove('bg-amber-100', 'dark:bg-amber-900/30', 'text-amber-700', 'dark:text-amber-400', 'font-bold');
+        link.classList.add('text-slate-600', 'dark:text-slate-400');
+    });
     
-    if(hash === '#horario') navH.classList.add('border-amber-500', 'text-amber-600', 'dark:text-amber-400');
-    else navH.classList.remove('border-amber-500', 'text-amber-600', 'dark:text-amber-400');
-
-    if(navG) {
-        if(hash === '#glosario') navG.classList.add('border-amber-500', 'text-amber-600', 'dark:text-amber-400');
-        else navG.classList.remove('border-amber-500', 'text-amber-600', 'dark:text-amber-400');
+    let activeId = '';
+    if (hash === '#home') activeId = 'nav-home';
+    else if (hash === '#tareas') activeId = 'nav-tareas';
+    else if (hash === '#horario') activeId = 'nav-horario';
+    else if (hash === '#glosario') activeId = 'nav-glosario';
+    
+    if (activeId) {
+        const el = document.getElementById(activeId);
+        if (el) {
+            el.classList.add('bg-amber-100', 'dark:bg-amber-900/30', 'text-amber-700', 'dark:text-amber-400', 'font-bold');
+            el.classList.remove('text-slate-600', 'dark:text-slate-400');
+        }
+    } else {
+        const sublink = document.querySelector(`.sidebar-sublink[href="${hash}"]`);
+        if (sublink) {
+            sublink.classList.add('bg-amber-100', 'dark:bg-amber-900/30', 'text-amber-700', 'dark:text-amber-400', 'font-bold');
+            sublink.classList.remove('text-slate-600', 'dark:text-slate-400');
+            const asigMenu = document.getElementById('asignaturas-menu');
+            const asigIcon = document.getElementById('asignaturas-icon');
+            if (asigMenu && (asigMenu.style.maxHeight === '0px' || asigMenu.style.maxHeight === '')) {
+                asigMenu.style.maxHeight = '500px';
+                asigIcon.classList.add('rotate-180');
+            }
+        }
     }
 }
 
+function initializeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggle-sidebar');
+    const sidebarIcon = document.getElementById('sidebar-icon');
+    const sidebarTexts = document.querySelectorAll('.sidebar-text');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    
+    let isExpanded = true;
+    
+    // Plegar/Desplegar en Escritorio
+    if(toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                sidebar.classList.remove('w-20'); sidebar.classList.add('w-64');
+                sidebarIcon.classList.remove('rotate-180');
+                sidebarTexts.forEach(el => el.classList.remove('hidden'));
+            } else {
+                sidebar.classList.remove('w-64'); sidebar.classList.add('w-20');
+                sidebarIcon.classList.add('rotate-180');
+                sidebarTexts.forEach(el => el.classList.add('hidden'));
+            }
+        });
+    }
+
+    // Abrir menú lateral en Móvil
+    if(mobileMenuBtn && sidebar && sidebarOverlay) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+        });
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+        // Cerrar menú al presionar un enlace en Móvil
+        document.querySelectorAll('.sidebar-link, .sidebar-sublink').forEach(link => {
+            link.addEventListener('click', () => {
+                if(window.innerWidth < 640) {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebarOverlay.classList.add('hidden');
+                }
+            });
+        });
+    }
+
+    // Acordeón de Asignaturas
+    const toggleAsigBtn = document.getElementById('toggle-asignaturas');
+    const asigMenu = document.getElementById('asignaturas-menu');
+    const asigIcon = document.getElementById('asignaturas-icon');
+    
+    if(toggleAsigBtn && asigMenu) {
+        toggleAsigBtn.addEventListener('click', () => {
+            if (asigMenu.style.maxHeight === '0px' || !asigMenu.style.maxHeight) {
+                asigMenu.style.maxHeight = '500px';
+                asigIcon.classList.add('rotate-180');
+                if (!isExpanded && toggleBtn) toggleBtn.click();
+            } else {
+                asigMenu.style.maxHeight = '0px';
+                asigIcon.classList.remove('rotate-180');
+            }
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeSidebar();
+});
 function renderDirectorio() {
     const contenedor = document.getElementById('contenedor-unidades');
     if(!contenedor) return;
@@ -325,11 +392,11 @@ function renderDashboardTasks() {
         }
 
         container.innerHTML += `
-            <div class="${statusConfig[task.status].color} border p-4 sm:p-5 rounded-xl shadow-sm flex items-center gap-4 sm:gap-5 transition-colors cursor-pointer" onclick="openDetailsModal('${task.id}')">
+            <div class="${statusConfig[task.status].color} border p-4 sm:p-5 rounded-3xl shadow-sm flex items-center gap-4 sm:gap-5 transition-all hover:-translate-y-1 cursor-pointer" onclick="openDetailsModal('${task.id}')">
                 ${dateDisplay}
                 <div class="flex-grow min-w-0">
                     <div class="flex items-center mb-1.5">
-                        <span class="bg-white/60 dark:bg-black/20 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 px-2 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase truncate">${task.subject}</span>
+                        <span class="bg-white/80 dark:bg-black/40 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 px-2.5 py-0.5 rounded-lg text-[9px] font-bold tracking-widest uppercase truncate shadow-sm">${task.subject}</span>
                         ${alertBadge}
                     </div>
                     <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">${task.title}</h4>
@@ -529,14 +596,14 @@ function renderGlosario(filtro = '') {
         };
         const clr = colors[c.color] || colors.slate;
         const card = document.createElement('div');
-        card.className = "bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 hover:shadow-lg hover:-translate-y-1 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 group flex flex-col h-full";
+        card.className = "glass-panel border-slate-200/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-soft hover:shadow-xl hover:-translate-y-1 hover:bg-white/90 dark:hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full";
         card.innerHTML = `
-            <div class="w-10 h-10 rounded-xl ${clr.bg} flex items-center justify-center ${clr.text} mb-4 group-hover:scale-110 transition-transform duration-300 shadow-inner shrink-0">
+            <div class="w-12 h-12 rounded-2xl ${clr.bg} flex items-center justify-center ${clr.text} mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner shrink-0">
                 <i class="fa-solid ${c.icon} text-lg"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-tight">${c.nombre}</h3>
+            <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 mb-2 leading-tight tracking-tight">${c.nombre}</h3>
             <p class="text-[13px] sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">${c.desc}</p>
-            <div class="mt-auto pt-3 border-t border-slate-100 dark:border-slate-700/50">
+            <div class="mt-auto pt-4 border-t border-slate-200/60 dark:border-slate-700/50">
                 <p class="text-[10px] font-bold uppercase tracking-widest ${clr.text} mb-1 flex items-center gap-1.5"><i class="fa-regular fa-lightbulb"></i> Ejemplo</p>
                 <p class="text-xs text-slate-500 dark:text-slate-400 italic leading-relaxed font-medium">${c.ejemplo}</p>
             </div>
